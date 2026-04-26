@@ -1,0 +1,1686 @@
+:root {
+  /* Paleta CatSalut / TSI (Servei Català de la Salut) */
+  --bg-color: #F5F9FD; /* Azul fondo ultra-claro sanitario */
+  --bg-card: rgba(255, 255, 255, 0.98);
+  --text-primary: #004580; /* Azul oscuro institucional de la Generalitat */
+  --text-secondary: #1e293b; /* Gris muy oscuro para mejor contraste - Modo Senior */
+  --primary-color: #6AAAE4; /* Azul cielo TSI (Pantone 284) */
+  --primary-hover: #5999d3;
+  --success-color: #10b981;
+  --danger-color: #E30613; /* Rojo Gencat (Pantone 485) */
+  --warning-color: #FFCC00; /* Amarillo Gencat (Pantone 136) */
+  --nav-bg: #ffffff;
+  --nav-active: #004580; /* Azul oscuro para los activos de navegación */
+  --nav-inactive: #475569; /* Gris oscuro para navegar sin problemas visuales */
+  --border-radius: 20px;
+  --border-color: #e2e8f0; /* Borde suave azulado */
+  --input-bg: #ffffff;
+  --shadow-sm: 0 1px 3px 0 rgba(0, 71, 128, 0.05), 0 1px 2px 0 rgba(0, 71, 128, 0.03);
+  --shadow-md: 0 10px 15px -3px rgba(0, 71, 128, 0.08), 0 4px 6px -2px rgba(0, 71, 128, 0.03);
+  --glass-border: 1px solid rgba(106, 170, 228, 0.2);
+  --glass-blur: blur(16px);
+}
+
+/* Nota: Se ha eliminado el modo oscuro automático para mantener el gris clarito solicitado por el usuario */
+
+
+/* Reset Base */
+html {
+  font-size: 20px; /* Reducido de 22px a 20px para mejor equilibrio composición/espacio */
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+  -webkit-tap-highlight-color: transparent;
+}
+
+button {
+  background: none;
+  border: none;
+  outline: none;
+  padding: 0;
+  margin: 0;
+  cursor: pointer;
+  font-family: inherit;
+  color: inherit;
+  min-height: 56px; /* Touch target mínimo accesible */
+}
+
+body {
+  background-color: var(--bg-color);
+  color: var(--text-primary);
+  width: 100vw;
+  height: 100vh;
+  overflow: hidden; /* Fija como app móvil */
+  display: flex;
+  flex-direction: column;
+}
+
+/* Header */
+.app-header {
+  padding: 1.5rem 1.5rem 0.5rem;
+  background-color: transparent;
+  z-index: 10;
+}
+
+#screen-title {
+  font-size: 1.45rem;
+  font-weight: 800;
+  color: var(--text-primary) !important;
+  letter-spacing: -0.5px;
+}
+
+/* Letra "i" con forma de cápsula + pastilla redonda */
+.pill-i {
+  display: inline-block;
+  width: 0.45em;
+  height: 1.15em;
+  vertical-align: baseline;
+  margin: 0 -0.02em;
+  position: relative;
+  top: 0.02em;
+}
+
+.pill-i svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+.icon-btn-header {
+  background: transparent;
+  border: none;
+  color: var(--text-primary);
+  cursor: pointer;
+  padding: 8px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.2s;
+}
+
+.icon-btn-header:active {
+  background: var(--border-color);
+}
+
+/* Contenido Principal (SPA views) */
+.app-content {
+  flex: 1;
+  overflow-y: auto;
+  padding: 0 1.5rem 6rem; /* padding inferior para la nav bar */
+  position: relative;
+}
+
+.screen {
+  display: none;
+  animation: fadeIn 0.3s ease-out;
+}
+
+.screen.active {
+  display: block;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* Titulos de sección dentro de la vista */
+.date-header, .history-header, .report-header {
+  margin-bottom: 2rem;
+  margin-top: 0.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.report-mode {
+  background-color: #fff;
+  border-radius: var(--border-radius);
+  padding: 2.5rem; /* Aumentar padding para airear documento */
+  box-shadow: var(--shadow-lg);
+  margin-top: 1rem;
+  border: 1px solid var(--border-color);
+  max-width: 900px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+@media (max-width: 600px) {
+  .report-mode {
+    padding: 1rem; /* Reducir radicalmente en móviles para ganar espacio lateral */
+    border-radius: 12px;
+  }
+  .app-content {
+    padding: 0 0.5rem 6rem; /* Reducir padding lateral del contenedor principal */
+  }
+}
+
+
+.report-header {
+  margin-bottom: 0.5rem;
+  padding-bottom: 0.5rem;
+}
+
+.report-date-header {
+  font-size: 1.05rem; /* Un poco más pequeña, como solicitaste */
+  font-weight: 800;
+  color: var(--text-primary);
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.report-treatment-section {
+  margin-top: 2rem;
+  border: 1px solid var(--border-color);
+  border-radius: 12px;
+  overflow: hidden;
+  background: #fafafa;
+  cursor: pointer;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.report-treatment-section:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-md);
+  border-color: var(--primary-color);
+}
+
+.report-treatment-title {
+  background: var(--text-primary); /* Azul fuerte CatSalut */
+  color: white;
+  padding: 0.75rem 1.5rem;
+  font-weight: 700;
+  font-size: 1rem;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.report-pills-table {
+  width: 100%;
+}
+
+.report-pill-row {
+  display: flex;
+  flex-direction: column; /* Cambiar a columna en móviles para que no se apriete */
+  gap: 1.25rem;
+  padding: 1.5rem;
+  border-bottom: 2px solid var(--border-color);
+  background: white;
+}
+
+@media (min-width: 600px) {
+  .report-pill-row {
+    flex-direction: row;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+}
+
+.report-pill-row:last-child {
+  border-bottom: none;
+}
+
+.report-pill-name {
+  font-weight: 700;
+  color: var(--text-primary);
+  font-size: 1.15rem; /* Más grande en Modo Senior */
+  word-break: break-word;
+  overflow-wrap: anywhere;
+  white-space: normal;
+  padding-right: 10px;
+}
+
+.report-count-label {
+  font-size: 0.8rem;
+  color: var(--text-secondary);
+  text-transform: uppercase;
+  font-weight: 700;
+  margin-bottom: 4px;
+  display: block;
+}
+
+.report-count-value {
+  font-size: 1.2rem;
+  font-weight: 800;
+  color: var(--text-primary);
+}
+
+.report-count-pending {
+  color: var(--warning-color);
+}
+
+.report-count-done {
+  color: var(--success-color);
+}
+
+/* --- CLASES DE CLARIDAD SENIOR (Rediseño Estructural) --- */
+.senior-block {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem; /* Reducido de 1.25rem */
+  padding: 1rem; /* Reducido de 1.25rem */
+  width: 100%;
+}
+
+.senior-medical-card {
+  background: white;
+  border-radius: 24px;
+  box-shadow: 0 4px 20px rgba(0, 71, 128, 0.08);
+  border: 1px solid rgba(106, 170, 228, 0.1);
+  margin-bottom: 2rem; /* Aumentado de 1.5rem a 2rem para evitar solapamientos visuales */
+  overflow: visible; /* Permitir que los badges respiren si es necesario */
+  transition: transform 0.2s ease;
+  width: 100%;
+}
+
+.senior-medical-card:active {
+  transform: scale(0.98);
+}
+
+
+.senior-name {
+  font-size: 1.5rem !important; /* Gigante para que no haya duda */
+  font-weight: 800;
+  color: var(--text-primary);
+  line-height: 1.2;
+  word-break: break-all; /* Forzar rotura incluso si no hay espacios */
+  overflow-wrap: anywhere;
+  display: block;
+}
+
+.senior-stat-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.5rem;
+  background: linear-gradient(135deg, #ffffff, #f8fafc);
+  padding: 0.6rem 0.5rem; /* Mucho más compacto */
+  border-radius: 16px;
+  border: 1px solid rgba(106, 170, 228, 0.2);
+  box-shadow: inset 0 2px 4px rgba(0,0,0,0.02);
+}
+
+.senior-stat-box {
+  text-align: center;
+  display: flex;
+  flex-direction: row; /* Una sola línea */
+  align-items: baseline;
+  justify-content: center;
+  gap: 0.4rem;
+}
+
+.senior-stat-label {
+  font-size: 0.6rem;
+  text-transform: uppercase;
+  font-weight: 800;
+  color: var(--text-secondary);
+  letter-spacing: 0.5px;
+  opacity: 0.8;
+}
+
+.senior-stat-value {
+  font-size: 1.3rem; /* Reducido para una sola línea */
+  font-weight: 900;
+  line-height: 1;
+}
+
+.senior-compartment-box {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #FFFBEB;
+  border: 2px solid #F59E0B;
+  color: #92400E;
+  padding: 0.6rem 1rem; /* Reducido de 1.25rem */
+  border-radius: 12px;
+  text-align: center;
+  font-weight: 900;
+  font-size: 1.1rem; /* Reducido de 1.25rem */
+  box-shadow: 0 4px 10px -2px rgba(245, 158, 11, 0.15);
+  margin: 0;
+}
+
+.senior-compartment-box svg {
+  margin-right: 12px;
+  flex-shrink: 0;
+}
+
+
+/* Rediseño de Detalle */
+.detail-section-container {
+  margin-top: 0.5rem;
+  padding: 1.5rem;
+  background: var(--bg-color);
+  border-radius: 16px;
+  border: 1px solid var(--border-color);
+}
+
+.detail-section-title {
+  font-size: 0.9rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  color: var(--text-secondary);
+  margin-bottom: 1rem;
+  letter-spacing: 0.5px;
+}
+
+.meds-horizontal-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.med-tag {
+  background: white;
+  padding: 8px 16px;
+  border-radius: 30px;
+  border: 1.5px solid var(--primary-color);
+  color: var(--text-primary);
+  font-weight: 700;
+  font-size: 0.9rem;
+  word-break: break-word;
+  overflow-wrap: anywhere;
+}
+
+.timeline-row {
+  display: grid;
+  grid-template-columns: 80px 1fr 120px;
+  padding: 1.25rem 0;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+  align-items: center;
+}
+
+.timeline-row:last-child {
+  border-bottom: none;
+}
+
+.timeline-time {
+  font-weight: 800;
+  color: var(--text-primary);
+  font-size: 1rem;
+}
+
+.timeline-pill {
+  font-weight: 600;
+  color: var(--text-secondary);
+  font-size: 0.95rem;
+  word-break: break-word;
+  overflow-wrap: anywhere;
+}
+
+.timeline-status {
+  text-align: right;
+  font-weight: 700;
+  font-size: 0.8rem;
+  text-transform: uppercase;
+}
+
+/* Timeline de Detalle */
+.detail-pill-item {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  padding: 1.5rem;
+  background: white;
+  border-radius: 12px;
+  border: 1px solid var(--border-color);
+  margin-bottom: 1.5rem;
+}
+
+.detail-pill-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 1px solid var(--bg-color);
+  padding-bottom: 0.75rem;
+}
+
+.toma-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.toma-row {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.9rem;
+  padding: 4px 0;
+}
+
+.toma-time {
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+.toma-status {
+  font-weight: 600;
+}
+
+.status-check {
+  color: var(--success-color);
+}
+
+.status-pending-time {
+  color: var(--text-secondary);
+  font-style: italic;
+}
+
+.report-brand {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.report-title-label {
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  color: var(--text-primary);
+  font-size: 1.1rem;
+}
+
+.report-patient-info {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 0.5rem;
+  background: var(--bg-color);
+  padding: 1rem;
+  border-radius: 12px;
+  border: 1px solid var(--border-color);
+}
+
+.patient-line {
+  display: flex;
+  gap: 8px;
+  font-size: 0.9rem;
+}
+
+.p-label {
+  font-weight: 700;
+  color: var(--text-secondary);
+  min-width: 100px;
+}
+
+.p-value {
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.report-date-line {
+  margin-top: 0.5rem;
+  font-size: 0.85rem;
+  text-align: right;
+  border-bottom: 1px dashed var(--border-color);
+  padding-bottom: 0.5rem;
+}
+
+.report-container {
+  margin-top: 2rem;
+}
+
+.report-row {
+  display: grid;
+  grid-template-columns: 2fr 1fr 1fr;
+  padding: 1rem 0;
+  border-bottom: 1px solid var(--border-color);
+  align-items: center;
+}
+
+.report-row:last-child {
+  border-bottom: none;
+}
+
+.report-pill-name {
+  font-weight: 700;
+  color: var(--text-primary);
+  font-size: 1rem;
+  word-break: break-word;
+  overflow-wrap: anywhere;
+}
+
+.report-pill-time {
+  font-weight: 600;
+  color: var(--text-secondary);
+  font-size: 0.9rem;
+  text-align: center;
+}
+
+.report-pill-status {
+  font-size: 0.8rem;
+  font-weight: 700;
+  padding: 4px 8px;
+  border-radius: 6px;
+  text-align: center;
+  text-transform: uppercase;
+}
+
+.status-pending {
+  background: #fef3c7;
+  color: #92400e;
+}
+
+.status-taken {
+  background: #d1fae5;
+  color: #065f46;
+}
+
+.mini-capsule-icon {
+  width: 24px;
+  height: 24px;
+  border-radius: 12px;
+  position: relative;
+  overflow: hidden;
+  border: 1.5px solid var(--text-primary);
+}
+
+.mini-capsule-icon::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  width: 100%;
+  height: 50%;
+  background: var(--text-primary); /* Azul fuerte */
+}
+
+.mini-capsule-icon::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  width: 100%;
+  height: 50%;
+  background: var(--primary-color);
+}
+
+.date-header h2, .history-header h2 {
+  font-size: 1.1rem;
+  font-weight: 500;
+  color: var(--text-secondary);
+}
+
+/* Cards (Glassmorphism + Modern) */
+.card {
+  background: var(--bg-card);
+  -webkit-backdrop-filter: var(--glass-blur);
+  backdrop-filter: var(--glass-blur);
+  border: var(--glass-border);
+  border-radius: var(--border-radius);
+  padding: 1.5rem;
+  box-shadow: var(--shadow-sm);
+  margin-bottom: 1rem;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.card:active {
+  transform: scale(0.98);
+}
+
+/* Formulario Añadir */
+.form-container h3 {
+  margin-bottom: 1.25rem;
+  font-size: 1.25rem;
+}
+
+.input-group {
+  margin-bottom: 1.25rem;
+}
+
+.input-group label {
+  display: block;
+  font-size: 0.95rem;
+  font-weight: 600; /* Más grueso */
+  margin-bottom: 0.6rem;
+  color: var(--text-primary); /* Más oscuro */
+}
+
+.input-group input,
+.input-group select {
+  width: 100%;
+  padding: 0.55rem 1rem; /* Reducido para ajustarse a 44px */
+  border-radius: 12px;
+  border: 2px solid var(--border-color); /* Más grueso y oscuro */
+  background-color: var(--input-bg);
+  color: var(--text-primary);
+  font-size: 1.05rem; /* Más grande en inputs */
+  min-height: 44px; /* Ajustado a 44px exactos como solicitaste */
+  outline: none;
+  transition: all 0.2s;
+}
+
+.input-group input:focus {
+  border-color: var(--primary-color);
+}
+
+.form-hint {
+  font-size: 0.8rem;
+  color: var(--text-secondary);
+  line-height: 1.4;
+  margin-bottom: 1.5rem;
+}
+
+/* Botones */
+.btn-primary {
+  width: 100%;
+  padding: 0.75rem; /* Reducido de 1rem a 0.75rem */
+  border-radius: 12px;
+  border: none;
+  background: linear-gradient(135deg, var(--primary-color), var(--primary-hover));
+  color: white;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  box-shadow: 0 4px 14px rgba(106, 170, 228, 0.3);
+  transition: all 0.2s ease;
+}
+
+.btn-primary:active {
+  transform: translateY(2px);
+  box-shadow: 0 2px 8px rgba(106, 170, 228, 0.2);
+}
+
+.btn-success {
+  background: linear-gradient(135deg, var(--success-color), #059669);
+  box-shadow: 0 4px 14px rgba(16, 185, 129, 0.4);
+}
+
+.btn-history-tool {
+  flex: 1;
+  min-height: 34px; /* Anulamos el min-height global de 56px */
+  background: #e0f2fe; /* Azul pastel clarito */
+  color: #0369a1; 
+  border: 1px solid #bae6fd;
+  padding: 4px;
+  border-radius: 6px;
+  font-size: 0.9rem; /* Fuente restaurada */
+  font-weight: 700;
+  line-height: 1.2;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 1px 2px rgba(3, 105, 161, 0.1);
+  transition: all 0.2s ease;
+}
+
+.btn-history-tool:active {
+  background: #bae6fd;
+  transform: translateY(2px);
+  box-shadow: none;
+}
+
+.btn-text {
+  width: 100%;
+  padding: 0.6rem; /* Reducido de 1rem a 0.6rem */
+  background: transparent;
+  border: none;
+  color: var(--text-secondary);
+  font-weight: 500;
+  font-size: 0.95rem;
+  cursor: pointer;
+  margin-top: 0.5rem;
+}
+
+/* Estado Vacío */
+.empty-state {
+  text-align: center;
+  padding: 3rem 1rem;
+  color: var(--text-secondary);
+  font-style: italic;
+  font-size: 0.95rem;
+}
+.hidden { display: none !important; }
+
+/* Pastilla Card (Item) — Glassmorphism */
+.pill-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1.25rem;
+  background: rgba(255, 255, 255, 0.7);
+  -webkit-backdrop-filter: blur(12px);
+  backdrop-filter: blur(12px);
+  border-radius: 16px;
+  margin-bottom: 0.75rem;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.8);
+  transition: all 0.3s ease;
+}
+
+/* Bug fix: Pastilla atrasada con borde rojo pulsante */
+.pill-item.border-red {
+  border-color: rgba(239, 68, 68, 0.4);
+  box-shadow: 0 2px 12px rgba(239, 68, 68, 0.12);
+  animation: pulse-red 2s infinite ease-in-out;
+}
+
+@keyframes pulse-red {
+  0%, 100% { box-shadow: 0 2px 12px rgba(239, 68, 68, 0.12); }
+  50% { box-shadow: 0 2px 16px rgba(239, 68, 68, 0.25); }
+}
+
+.pill-item.taken {
+  border-color: rgba(16, 185, 129, 0.3);
+  opacity: 0.7;
+}
+
+.pill-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.pill-info h4 {
+  font-size: 1.1rem;
+  margin-bottom: 0.25rem;
+  word-break: break-all;
+  overflow-wrap: anywhere;
+}
+.pill-info p {
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+}
+
+/* History Mini Pill */
+.history-pill-item {
+  padding: 0.6rem 0.8rem;
+  border-radius: 10px;
+}
+.history-pill-item .pill-info h4 {
+  font-size: 0.95rem;
+  margin-bottom: 0.15rem;
+}
+.history-pill-item .pill-info p {
+  font-size: 0.8rem;
+}
+.history-pill-item .check-btn {
+  width: 32px !important;
+  height: 32px !important;
+  min-height: 32px !important;
+  border-radius: 8px;
+}
+.history-pill-item .check-btn svg {
+  width: 18px;
+  height: 18px;
+}
+.history-checkbox {
+  transform: scale(0.9);
+  margin-right: 0.5rem;
+}
+
+/* Iconos de Time dentro del info */
+.icon-time { width: 14px; height: 14px; }
+
+/* Cuenta atrás en tiempo real */
+.countdown {
+  display: block;
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: var(--success-color);
+  margin-top: 5px;
+  letter-spacing: 0.01em;
+  font-variant-numeric: tabular-nums;
+}
+
+.countdown-overdue {
+  color: var(--danger-color);
+  animation: pulse-badge 1s infinite;
+}
+
+/* Badges de duración */
+.badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 0.7rem;
+  font-weight: 600;
+  padding: 4px 10px;
+  border-radius: 8px;
+  letter-spacing: 0.02em;
+  font-style: normal;
+  white-space: nowrap;
+}
+
+.badge-container {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px; /* Espacio horizontal y vertical entre cartelas */
+  margin-top: 10px; /* Separación de la cuenta atrás */
+}
+
+.badge-info {
+  background: rgba(99, 102, 241, 0.15);
+  color: var(--primary-color);
+}
+
+.badge-warning {
+  background: rgba(245, 158, 11, 0.15);
+  color: var(--warning-color);
+}
+
+.badge-urgent {
+  background: rgba(239, 68, 68, 0.15);
+  color: var(--danger-color);
+  animation: pulse-badge 1.5s infinite;
+}
+
+/* Badge de Stock */
+.badge-stock {
+  background: rgba(245, 158, 11, 0.15);
+  color: #d97706;
+  border: 1px solid rgba(245, 158, 11, 0.3);
+}
+
+@keyframes pulse-badge {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.6; }
+}
+
+/* Botones de acción en tarjetas de hoy (editar, eliminar) */
+.pill-actions {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-shrink: 0;
+}
+
+.action-btn {
+  width: 52px;
+  height: 52px;
+  border-radius: 12px;
+  border: 1.5px solid var(--border-color);
+  background: transparent;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text-secondary);
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.action-btn:active {
+  transform: scale(0.9);
+}
+
+.action-edit:hover,
+.action-edit:active {
+  border-color: var(--primary-color);
+  color: var(--primary-color);
+  background: rgba(99, 102, 241, 0.1);
+}
+
+.action-delete:hover,
+.action-delete:active {
+  border-color: var(--danger-color);
+  color: var(--danger-color);
+  background: rgba(239, 68, 68, 0.1);
+}
+
+/* Casilla de verificación (Check) */
+.check-btn {
+  width: 52px;
+  height: 52px;
+  border-radius: 10px; /* Cuadrado con redondeo ligero */
+  border: 2px solid var(--border-color);
+  background: transparent;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: transparent;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.check-btn:hover,
+.check-btn:active {
+  border-color: var(--success-color);
+  color: var(--success-color);
+  background: rgba(16, 185, 129, 0.1);
+}
+
+.pill-item.taken .check-btn {
+  background: var(--success-color);
+  border-color: var(--success-color);
+  color: white;
+}
+
+/* Bottom Nav */
+.bottom-nav {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 80px;
+  background: var(--nav-bg);
+  -webkit-backdrop-filter: blur(10px);
+  backdrop-filter: blur(10px);
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+  border-top: 1px solid var(--border-color);
+  padding-bottom: env(safe-area-inset-bottom, 15px); /* Para iPhone Notch */
+  z-index: 1100;
+  box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.03);
+}
+
+.nav-item {
+  color: var(--nav-inactive);
+  background: transparent;
+  border: none;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  flex: 1;
+  height: 100%;
+  gap: 4px;
+}
+
+.nav-item svg {
+  color: var(--nav-inactive);
+}
+
+.nav-item.active {
+  color: var(--nav-active);
+}
+
+.nav-item.active svg {
+  color: var(--nav-active);
+}
+
+.nav-item svg {
+  transition: transform 0.2s;
+}
+.nav-item.active svg {
+  transform: translateY(-2px);
+}
+
+/* Botón flotante central en nav */
+.nav-add .fab-button {
+  background: var(--primary-color);
+  color: white;
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transform: translateY(-10px);
+  box-shadow: 0 4px 15px rgba(79, 70, 229, 0.4);
+  transition: transform 0.2s;
+}
+.nav-add:active .fab-button {
+  transform: translateY(-8px) scale(0.95);
+}
+
+/* Modal Alarma */
+.modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: rgba(0, 0, 0, 0.5);
+  -webkit-backdrop-filter: blur(5px);
+  backdrop-filter: blur(5px);
+  z-index: 2000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 1;
+  transition: opacity 0.3s;
+}
+
+.alarm-bg {
+  background: linear-gradient(135deg, var(--danger-color), #b91c1c); /* Rojo Alarma Gencat */
+  border: none;
+  width: 90%;
+  max-width: 350px;
+  text-align: center;
+  padding: 2.5rem 1.5rem;
+}
+
+.text-white { color: white; }
+
+.pill-name-large {
+  font-size: 2rem;
+  font-weight: 700;
+  margin: 1rem 0;
+}
+
+.pill-pulse svg {
+  animation: heartbeat 1.5s infinite ease-in-out;
+  transform-origin: center;
+}
+
+@keyframes heartbeat {
+  0% { transform: scale(1); }
+  15% { transform: scale(1.15); }
+  30% { transform: scale(1); }
+  45% { transform: scale(1.15); }
+  60% { transform: scale(1); }
+  100% { transform: scale(1); }
+}
+
+/* Utilities */
+.mt-2 { margin-top: 0.5rem; }
+.mt-4 { margin-top: 1rem; }
+
+/* -------------------------------------
+   HISTORIAL: BARRA Y CHECKBOXES
+------------------------------------- */
+
+.history-toolbar {
+  display: flex;
+  justify-content: space-between;
+  gap: 8px;
+  margin-bottom: 1.5rem;
+  padding: 0 4px;
+}
+
+.btn-toolbar {
+  flex: 1;
+  padding: 10px 4px;
+  border-radius: 12px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  border: 1px solid rgba(255, 255, 255, 0.5);
+  cursor: pointer;
+  transition: opacity 0.2s, transform 0.1s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(255, 255, 255, 0.35);
+  -webkit-backdrop-filter: blur(14px);
+  backdrop-filter: blur(14px);
+  color: var(--text-primary);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+}
+
+.btn-toolbar:active {
+  transform: scale(0.97);
+  background: rgba(255, 255, 255, 0.25);
+}
+
+.btn-danger {
+  background: var(--danger-color);
+  color: white;
+}
+
+.btn-danger-outline {
+  background: transparent;
+  color: var(--danger-color);
+  border: 1.5px solid var(--danger-color);
+}
+
+.history-item-container {
+  display: block; /* Ocupa todo el ancho */
+  margin-bottom: 12px;
+  position: relative;
+}
+
+.history-checkbox {
+  position: absolute;
+  top: 1.25rem;
+  left: 1rem;
+  width: 22px;
+  height: 22px;
+  accent-color: var(--primary-color);
+  cursor: pointer;
+  z-index: 5;
+}
+
+/* Ajustar el padding de la tarjeta en historial para dejar hueco al checkbox */
+.list-with-checkboxes .pill-item {
+  padding-left: 3.5rem;
+}
+
+.history-item-container .pill-card {
+  margin-bottom: 0;
+  flex: 1;
+}
+
+.history-item-container .pill-item {
+  flex: 1;
+}
+/* -------------------------------------
+   ONBOARDING: BIENVENIDA Y DATOS
+------------------------------------- */
+
+.onboarding-screen {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background-color: var(--bg-color);
+  z-index: 1000;
+  display: none; /* Oculto por defecto, heredado de .screen */
+  flex-direction: column;
+  padding: 2rem;
+  overflow-y: auto;
+  animation: fadeIn 0.4s ease-out;
+}
+
+.onboarding-screen.active {
+  display: flex !important; /* Forzar flex cuando está activo */
+}
+
+
+.onboarding-content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+  max-width: 400px;
+  margin: 0 auto;
+}
+
+.welcome-icon {
+  margin-bottom: 2.5rem;
+  perspective: 1000px;
+  animation: float 3s ease-in-out infinite;
+}
+
+/* Cápsula de Cristal */
+.glass-capsule {
+  width: 60px;
+  height: 120px;
+  display: flex;
+  flex-direction: column;
+  filter: drop-shadow(0 15px 25px rgba(79, 70, 229, 0.2));
+  transform: rotate(15deg);
+}
+
+.capsule-top, .capsule-bottom {
+  flex: 1;
+  width: 100%;
+  -webkit-backdrop-filter: blur(10px);
+  backdrop-filter: blur(10px);
+  border: 1.5px solid rgba(255, 255, 255, 0.4);
+  position: relative;
+  overflow: hidden;
+}
+
+.capsule-top {
+  border-radius: 40px 40px 0 0;
+  background: var(--text-primary); /* Azul fuerte Gencat */
+  border-bottom: none;
+}
+
+.capsule-bottom {
+  border-radius: 0 0 40px 40px;
+  background: var(--primary-color); /* Azul cielo TSI */
+}
+
+/* Brillo de cristal */
+.capsule-top::after, .capsule-bottom::after {
+  content: "";
+  position: absolute;
+  top: 10%;
+  left: 15%;
+  width: 40%;
+  height: 40%;
+  background: linear-gradient(135deg, rgba(255,255,255,0.6) 0%, transparent 60%);
+  border-radius: 40px;
+  filter: blur(2px);
+}
+
+@keyframes float {
+  0%, 100% { transform: translateY(0) rotate(15deg); }
+  50% { transform: translateY(-15px) rotate(10deg); }
+}
+
+
+.welcome-title {
+  font-size: 2.2rem;
+  font-weight: 800;
+  color: var(--text-primary);
+  margin-bottom: 1.5rem;
+  line-height: 1.1;
+}
+
+.welcome-desc {
+  font-size: 1.15rem;
+  color: var(--text-secondary);
+  line-height: 1.6;
+  margin-bottom: 3rem;
+}
+
+.welcome-desc strong {
+  color: var(--primary-color);
+}
+
+.onboarding-footer {
+  margin-top: auto;
+  padding-bottom: 6rem; /* Espacio para la barra de navegación inferior */
+  width: 100%;
+}
+
+/* Botón Cápsula solicitado - Glassmorphism Bluish */
+.btn-capsule {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  width: 100%;
+  padding: 1.25rem;
+  background: var(--text-primary); /* Azul fuerte CatSalut */
+  color: white;
+  border: none;
+  border-radius: 40px;
+  font-size: 1.1rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 1.5px;
+  box-shadow: 0 10px 30px rgba(0, 69, 128, 0.2);
+  transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  cursor: pointer;
+}
+
+.btn-capsule:active {
+  transform: scale(0.96);
+  background: rgba(79, 70, 229, 0.2);
+  box-shadow: 0 5px 15px rgba(79, 70, 229, 0.2);
+}
+
+
+/* Formulario Onboarding */
+.onboarding-form-card {
+  width: 100%;
+  text-align: left;
+}
+
+.onboarding-form-card h3 {
+  font-size: 1.8rem;
+  margin-bottom: 1.5rem;
+}
+
+/* Utility to hide UI */
+body.onboarding-active .app-header {
+  display: none !important;
+}
+
+body.onboarding-active .app-content {
+  padding-top: 0;
+  padding-bottom: 0;
+}
+
+/* Estilos para Gestión de Múltiples Tratamientos */
+.treatment-label {
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--primary-color);
+  background: rgba(79, 70, 229, 0.1);
+  padding: 6px 14px;
+  border-radius: 20px;
+  display: inline-block;
+  margin-top: 6px;
+}
+
+.btn-full {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: auto;
+  min-width: 200px;
+  margin: 0 auto;
+  padding: 1rem 2rem;
+  font-size: 1rem;
+  font-weight: 700;
+  border-radius: 50px; /* Redondo (Pill style) */
+  background: var(--primary-color);
+  color: white;
+  border: none;
+  cursor: pointer;
+  box-shadow: 0 4px 15px rgba(79, 70, 229, 0.25);
+  transition: all 0.2s;
+}
+
+.btn-full:active {
+  transform: scale(0.95);
+  box-shadow: 0 2px 8px rgba(79, 70, 229, 0.2);
+}
+
+/* Tarjetas de Tratamiento Activo */
+.treatment-card {
+  background: var(--bg-card);
+  border-radius: 16px;
+  padding: 1.25rem;
+  box-shadow: var(--shadow-sm);
+  margin-bottom: 1rem;
+  border: 1px solid var(--border-color);
+  transition: transform 0.2s;
+}
+
+.treatment-card:active {
+  transform: scale(0.98);
+}
+
+.treatment-card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 0.75rem;
+}
+
+.treatment-card-info h4 {
+  font-size: 1.2rem;
+  font-weight: 800;
+  color: var(--text-primary);
+  margin-bottom: 2px;
+}
+
+.treatment-card-pathology {
+  font-size: 0.9rem;
+  color: var(--primary-color);
+  font-weight: 600;
+}
+
+.treatment-card-meta {
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.pills-summary-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: 1rem;
+  padding-top: 1rem;
+  border-top: 1px dashed var(--border-color);
+}
+
+.pill-summary-tag {
+  font-size: 0.75rem;
+  background: #f3f4f6;
+  color: #374151;
+  padding: 3px 10px;
+  border-radius: 6px;
+  border: 1px solid #e5e7eb;
+}
+
+/* Secciones de Tratamiento en Pantalla Hoy */
+.treatment-section {
+  background: rgba(255, 255, 255, 0.4);
+  border-radius: 20px;
+  padding: 1.25rem;
+  margin-bottom: 2rem;
+  border: 1.5px solid rgba(255, 255, 255, 0.6);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.03);
+}
+
+.treatment-section-header {
+  margin-bottom: 1.25rem;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.treatment-section-title {
+  font-size: 1.3rem;
+  font-weight: 800;
+  color: var(--text-primary);
+  text-transform: capitalize;
+}
+
+.treatment-section-badge {
+  font-size: 0.75rem;
+  font-weight: 700;
+  background: var(--primary-color);
+  color: white;
+  padding: 4px 10px;
+  border-radius: 10px;
+}
+
+.treatment-section .pill-item {
+  background: rgba(255, 255, 255, 0.85);
+  margin-bottom: 1rem;
+}
+
+.treatment-section .pill-item:last-child {
+  margin-bottom: 0;
+}
+
+.btn-add-to-treatment {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  margin-top: 1.25rem;
+  padding: 0.75rem;
+  background: rgba(79, 70, 229, 0.08);
+  border: 1.5px dashed var(--primary-color);
+  border-radius: 12px;
+  color: var(--primary-color);
+  font-size: 0.95rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.btn-add-to-treatment:active {
+  background: rgba(79, 70, 229, 0.15);
+  transform: scale(0.98);
+}
+
+
+/* --- Refactored Inline Styles --- */
+.flex-between-center {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.text-dark-bold {
+  color: black;
+  font-weight: 800;
+  text-transform: none;
+}
+.flex-gap-8-center {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+.icon-28px {
+  width:28px;
+  height:28px;
+}
+.mt-0-5rem {
+  margin-top: 0.5rem;
+}
+.mt-0-5rem-normal {
+  margin-top: 0.5rem;
+  font-style: normal;
+}
+.tip-container {
+  margin-top: 3rem;
+  padding: 1.5rem;
+  background: #e0f2fe;
+  border-radius: 12px;
+  border-left: 4px solid var(--primary-color);
+}
+.tip-title {
+  font-weight: 700;
+  color: #0369a1;
+  margin-bottom: 0.5rem;
+  font-size: 0.95rem;
+}
+.tip-text {
+  color: #0c4a6e;
+  font-size: 0.95rem;
+  line-height: 1.5;
+}
+.flex-gap-8-bold {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--text-primary);
+  font-weight: 700;
+  padding: 0.5rem 0;
+}
+.flex-between-center-mb {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.5rem;
+}
+.mb-0 {
+  margin-bottom: 0;
+}
+.btn-small {
+  padding: 0.25rem 0.75rem;
+  font-size: 0.8rem;
+  width: auto;
+  box-shadow: none;
+}
+.mt-1rem {
+  margin-top: 1rem;
+}
+.icon-middle-mr-4 {
+  vertical-align: middle;
+  margin-right: 4px;
+}
+.select-styled {
+  width:100%;
+  padding: 8px; /* Reducido de 12px a 8px */
+  border: 1px solid var(--border-color);
+  border-radius: 12px;
+  font-size: 1rem;
+  margin-top: 8px;
+  background: white;
+}
+.form-actions {
+  display: flex;
+  gap: 10px;
+  margin-top: 1.5rem;
+}
+.btn-outline {
+  flex: 1;
+  padding: 7px; /* Reducido de 10px a 7px */
+  color: var(--text-secondary);
+  border: 1px solid var(--border-color);
+  border-radius: 12px;
+}
+.btn-fill {
+  flex: 1;
+  padding: 7px; /* Reducido de 10px a 7px */
+}
+.btn-auto-small {
+  width: auto;
+  padding: 0.4rem 1rem; /* Reducido de 0.5rem a 0.4rem */
+  font-size: 0.9rem;
+}
+.btn-text-primary {
+  color: var(--primary-color);
+  font-weight: 600;
+}
+.toolbar-wrapper {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 1rem;
+}
+.icon-mr-3 {
+  margin-right: 3px;
+}
+.icon-middle-mr-6 {
+  vertical-align: middle;
+  margin-right: 6px;
+}
+.mb-1-5rem {
+  margin-bottom:1.5rem;
+}
+.icon-middle-mr-8 {
+  vertical-align: middle;
+  margin-right: 8px;
+}
+.mb-1rem {
+  margin-bottom:1rem;
+}
+.btn-backup {
+  background:#475569;
+  box-shadow:none;
+  margin-bottom:12px;
+}
+.btn-restore {
+  background:#94a3b8;
+  box-shadow:none;
+}
+.hidden-input {
+  display:none;
+}
+.icon-24px {
+  width:24px;
+  height:24px;
+}
+.modal-box {
+  width: 90%;
+  max-width: 380px;
+  padding: 2rem 1.5rem;
+}
+.mb-0-5rem-primary {
+  margin-bottom: 0.5rem;
+  color: var(--text-primary);
+}
+.mb-1-5rem {
+  margin-bottom: 1.5rem;
+}
+.btn-outline-border {
+  flex: 1;
+  padding: 10px;
+  border: 1px solid var(--border-color);
+  border-radius: 12px;
+}
+.modal-text-center {
+  text-align: center;
+  width: 90%;
+  max-width: 330px;
+  padding: 2rem 1.5rem;
+}
+.modal-msg-text {
+  margin-bottom: 1.5rem;
+  color: var(--text-secondary);
+  line-height: 1.4;
+}
+.modal-actions {
+  display: flex;
+  gap: 10px;
+  justify-content: center;
+}
+.modal-cancel-text {
+  flex: 1;
+  padding: 10px;
+  color: var(--text-secondary);
+}
+.modal-title {
+  margin-bottom: 1.25rem;
+  color: var(--text-primary);
+}
+
+.pills-summary-list {
+  display: flex;
+  flex-direction: column; 
+  gap: 10px;
+  margin-top: 1.5rem;
+}
+
+.pill-summary-tag {
+  background: #f1f5f9;
+  padding: 10px 15px;
+  border-radius: 12px;
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  border: 1.5px solid var(--border-color);
+  word-break: break-all;
+  overflow-wrap: anywhere;
+}
