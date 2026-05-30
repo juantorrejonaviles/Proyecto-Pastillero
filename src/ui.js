@@ -4,6 +4,33 @@ import { cancelCapacitorNotification } from './notifications.js';
 
 // DOM Element placeholders (Queried dynamically to avoid importing everything)
 // --- 7. Renderizado de Interfaz Dinámica ---
+// Helper para generar icono de pastilla
+export function generatePillIconHTML(color) {
+  const colorMap = {
+    white: '#ffffff', red: '#ef4444', blue: '#3b82f6', 
+    yellow: '#facc15', green: '#22c55e', pink: '#ec4899',
+    'capsule-red-white': '#ef4444', 'capsule-blue-white': '#3b82f6',
+    'capsule-green-white': '#22c55e', 'capsule-yellow-white': '#facc15',
+    'capsule-red-yellow': '#ef4444', 'capsule-blue-yellow': '#3b82f6'
+  };
+  const pillColor = colorMap[color] || '#ffffff';
+  const bgColorMap = {
+    white: '#f1f5f9', red: '#fee2e2', blue: '#eff6ff', 
+    yellow: '#fef08a', green: '#dcfce7', pink: '#fce7f3',
+    'capsule-red-white': '#ffffff', 'capsule-blue-white': '#ffffff',
+    'capsule-green-white': '#ffffff', 'capsule-yellow-white': '#ffffff',
+    'capsule-red-yellow': '#facc15', 'capsule-blue-yellow': '#facc15'
+  };
+  const bgPillColor = bgColorMap[color] || '#f1f5f9';
+  const isCapsule = (color || '').startsWith('capsule-');
+
+  if (isCapsule) {
+    return `<div class="pill-icon-container-capsule" style="background: linear-gradient(90deg, ${pillColor} 50%, ${bgPillColor} 50%); border: 2px solid ${pillColor}; box-shadow: 0 1px 3px rgba(0,0,0,0.15); display: inline-block; vertical-align: middle;"><div class="pill-icon-capsule-divider"></div></div>`;
+  } else {
+    return `<div class="pill-icon-container-circle" style="background: ${pillColor}; border: 2px solid #cbd5e1; box-shadow: 0 1px 3px rgba(0,0,0,0.15); margin-left: 6px; margin-right: 6px; display: inline-block; vertical-align: middle;"></div>`;
+  }
+}
+
 // --- 7. Renderizado de Interfaz Dinámica ---
 export function renderViews() {
   renderToday();
@@ -74,7 +101,7 @@ export function renderToday() {
     const table = section.querySelector('.report-pills-table');
 
     if (treatmentPills.length === 0) {
-      table.innerHTML = '<div style="text-align: center; padding: 1rem; color: var(--text-secondary); font-size: 0.9rem;">Sin medicación. Toca para añadir.</div>';
+      table.innerHTML = '<div class="report-empty-text">Sin medicación. Toca para añadir.</div>';
     }
 
     treatmentPills.forEach(pill => {
@@ -94,40 +121,16 @@ export function renderToday() {
         if (remaining > 50) break; 
       }
 
-      const colorMap = {
-        white: '#ffffff', red: '#ef4444', blue: '#3b82f6', 
-        yellow: '#facc15', green: '#22c55e', pink: '#ec4899',
-        'capsule-red-white': '#ef4444', 'capsule-blue-white': '#3b82f6',
-        'capsule-green-white': '#22c55e', 'capsule-yellow-white': '#facc15',
-        'capsule-red-yellow': '#ef4444', 'capsule-blue-yellow': '#3b82f6'
-      };
-      const pillColor = colorMap[pill.color] || '#ffffff';
-      const bgColorMap = {
-        white: '#f1f5f9', red: '#fee2e2', blue: '#eff6ff', 
-        yellow: '#fef08a', green: '#dcfce7', pink: '#fce7f3',
-        'capsule-red-white': '#ffffff', 'capsule-blue-white': '#ffffff',
-        'capsule-green-white': '#ffffff', 'capsule-yellow-white': '#ffffff',
-        'capsule-red-yellow': '#facc15', 'capsule-blue-yellow': '#facc15'
-      };
-      const bgPillColor = bgColorMap[pill.color] || '#f1f5f9';
-      const isCapsule = (pill.color || '').startsWith('capsule-');
-
-      // Generar el icono de pastilla
-      let pillIconHTML;
-      if (isCapsule) {
-        pillIconHTML = `<div style="width: 36px; height: 18px; border-radius: 9px; background: linear-gradient(90deg, ${pillColor} 50%, ${bgPillColor} 50%); border: 2px solid ${pillColor}; flex-shrink: 0; position: relative;"><div style="position:absolute; left:50%; top:0; bottom:0; width:2px; background: rgba(0,0,0,0.15);"></div></div>`;
-      } else {
-        pillIconHTML = `<div style="width: 36px; height: 18px; border-radius: 9px; background: linear-gradient(90deg, ${pillColor} 50%, ${bgPillColor} 50%); border: 2px solid ${pillColor}; flex-shrink: 0; position: relative;"><div style="position:absolute; left:50%; top:0; bottom:0; width:2px; background: rgba(0,0,0,0.15);"></div></div>`;
-      }
+      const pillIconHTML = generatePillIconHTML(pill.color);
 
       const card = document.createElement('div');
       card.className = 'senior-medical-card';
       
       card.innerHTML = `
         <div class="senior-block">
-          <div style="display:flex; align-items:center; gap: 12px;">
+          <div class="detail-card-row" style="align-items: center; margin-bottom: 0.5rem;">
             ${pillIconHTML}
-            <span class="senior-name">${pill.name}</span>
+            <span class="senior-name" style="font-size: 1.25rem; font-weight: 700; color: #0f172a; margin-left: 8px;">${pill.name}</span>
           </div>
 
           ${pill.compartment ? `
@@ -141,14 +144,14 @@ export function renderToday() {
           ` : ''}
 
           <div style="display:flex; flex-wrap: wrap; gap: 8px;">
-            ${pill.indications === 'food' ? `<span style="background: #E0F2FE; color: #0369a1; padding: 6px 12px; border-radius: 8px; font-size: 0.85rem; font-weight: 800; border: 1px solid #BAE6FD;">🍴 CON COMIDA</span>` : ''}
-            ${pill.indications === 'fasting' ? `<span style="background: #F1F5F9; color: #475569; padding: 6px 12px; border-radius: 8px; font-size: 0.85rem; font-weight: 800; border: 1px solid #E2E8F0;">🌙 EN AYUNAS</span>` : ''}
+            ${pill.indications === 'food' ? `<span class="badge-indications-food">🍴 CON COMIDA</span>` : ''}
+            ${pill.indications === 'fasting' ? `<span class="badge-indications-fasting">🌙 EN AYUNAS</span>` : ''}
           </div>
 
-          <div style="display:flex; align-items:center; justify-content:center; gap: 1.5rem; background: #f8fafc; padding: 8px 12px; border-radius: 12px; border: 1px solid rgba(106,170,228,0.15); white-space: nowrap;">
-            <span style="font-size: 0.7rem; font-weight: 800; color: #64748b; text-transform: uppercase;">Hechas hoy <span style="font-size: 1.2rem; font-weight: 900; color: var(--success-color); margin-left: 4px;">${doneToday}</span></span>
-            <span style="width: 1px; height: 20px; background: #cbd5e1;"></span>
-            <span style="font-size: 0.7rem; font-weight: 800; color: #64748b; text-transform: uppercase;">Quedan hoy <span style="font-size: 1.2rem; font-weight: 900; color: ${remaining > 0 ? '#F59E0B' : 'var(--success-color)'}; margin-left: 4px;">${remaining}</span></span>
+          <div class="senior-pill-compliance-tray">
+            <span class="senior-tray-label">Hechas hoy <span class="senior-tray-value" style="color: var(--success-color);">${doneToday}</span></span>
+            <span class="senior-tray-divider"></span>
+            <span class="senior-tray-label">Quedan hoy <span class="senior-tray-value" style="color: ${remaining > 0 ? '#F59E0B' : 'var(--success-color)'};">${remaining}</span></span>
           </div>
         </div>
       `;
@@ -211,13 +214,13 @@ export function renderHistory() {
 
     Object.keys(groups).forEach(dateStr => {
       const dateHeader = document.createElement('h3');
-      dateHeader.style = "margin: 1.5rem 0 0.5rem; color: var(--text-primary); text-transform: capitalize; font-size: 1.1rem; font-weight:800;";
+      dateHeader.className = 'history-date-header';
       dateHeader.textContent = dateStr;
       document.getElementById('history-list').appendChild(dateHeader);
 
       Object.keys(groups[dateStr]).forEach(treatmentName => {
         const treatmentHeader = document.createElement('h4');
-        treatmentHeader.style = "margin: 0.5rem 0 0.75rem; color: var(--success-color); font-size: 0.95rem; border-bottom: 2px solid var(--border-color); padding-bottom: 4px; font-weight:700;";
+        treatmentHeader.className = 'history-treatment-header';
         treatmentHeader.textContent = treatmentName;
         document.getElementById('history-list').appendChild(treatmentHeader);
 
@@ -233,7 +236,7 @@ export function renderHistory() {
                 <h4>${record.name}</h4>
                 <p>Hora: ${new Date(record.takenAt).toLocaleTimeString('es-ES', {hour: '2-digit', minute:'2-digit'})}</p>
               </div>
-              <div class="check-btn" style="background:var(--success-color); border-color:var(--success-color); color:white; cursor:default">
+              <div class="check-btn history-check-taken">
                 <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg>
               </div>
             </div>
@@ -273,17 +276,38 @@ export function renderTreatmentDetail(treatmentId) {
   }
 
   // 1. Listado de Medicamentos incluido (Grandes Tarjetas Expandidas)
-  medsContainer.style.display = "flex";
-  medsContainer.style.flexDirection = "column";
-  medsContainer.style.gap = "1rem";
+  medsContainer.classList.add('detail-meds-vertical-list');
   
   treatmentPills.forEach(pill => {
     const card = document.createElement('div');
-    card.style = "background: #fff; border: 2px solid var(--border-color); border-radius: 16px; padding: 1.5rem; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05); display: flex; flex-direction: column; gap: 0.75rem;";
+    card.className = 'timeline-card';
+    card.style = 'background: #ffffff; border: 3px solid #e2e8f0; border-left: 8px solid #3B82F6; margin-bottom: 1rem;';
     
     // Mapeo de colores visual
-    const colorMap = { white: '#ffffff', red: '#ef4444', blue: '#3b82f6', yellow: '#facc15', green: '#22c55e', pink: '#ec4899' };
+    const colorMap = {
+      white: '#ffffff', red: '#ef4444', blue: '#3b82f6', 
+      yellow: '#facc15', green: '#22c55e', pink: '#ec4899',
+      'capsule-red-white': '#ef4444', 'capsule-blue-white': '#3b82f6',
+      'capsule-green-white': '#22c55e', 'capsule-yellow-white': '#facc15',
+      'capsule-red-yellow': '#ef4444', 'capsule-blue-yellow': '#3b82f6'
+    };
     const pillColor = colorMap[pill.color] || '#ffffff';
+    const bgColorMap = {
+      white: '#f1f5f9', red: '#fee2e2', blue: '#eff6ff', 
+      yellow: '#fef08a', green: '#dcfce7', pink: '#fce7f3',
+      'capsule-red-white': '#ffffff', 'capsule-blue-white': '#ffffff',
+      'capsule-green-white': '#ffffff', 'capsule-yellow-white': '#ffffff',
+      'capsule-red-yellow': '#facc15', 'capsule-blue-yellow': '#facc15'
+    };
+    const bgPillColor = bgColorMap[pill.color] || '#f1f5f9';
+    const isCapsule = (pill.color || '').startsWith('capsule-');
+
+    let pillIconHTML;
+    if (isCapsule) {
+      pillIconHTML = `<div class="pill-icon-container-capsule" style="background: linear-gradient(90deg, ${pillColor} 50%, ${bgPillColor} 50%); border: 2px solid ${pillColor}; flex-shrink: 0; position: relative; box-shadow: 0 2px 4px rgba(0,0,0,0.1);"><div class="pill-icon-capsule-divider"></div></div>`;
+    } else {
+      pillIconHTML = `<div class="pill-icon-detail-circle" style="background: ${pillColor}; border: 2px solid #cbd5e1; box-shadow: 0 2px 4px rgba(0,0,0,0.1); margin-left: 2px; margin-right: 2px;"></div>`;
+    }
     
     // Calculo de tiempo
     const daysLeft = getDaysRemaining(pill);
@@ -292,26 +316,29 @@ export function renderTreatmentDetail(treatmentId) {
     let stockHTML = '';
     if (pill.stock !== null) {
       const stockColor = pill.stock <= pill.minStock ? 'var(--danger-color)' : 'var(--success-color)';
-      stockHTML = `<span style="color: ${stockColor}; font-weight: 700; font-size: 0.85rem; white-space: nowrap;">📦 Quedan ${pill.stock} ud.</span>`;
+      stockHTML = `<span class="detail-stock-text" style="color: ${stockColor};">📦 Quedan ${pill.stock} ud.</span>`;
     }
 
     card.innerHTML = `
-      <div style="display: flex; align-items: center; gap: 12px;">
-        <div style="width: 32px; height: 32px; border-radius: 50%; background: ${pillColor}; border: 2px solid #cbd5e1; box-shadow: 0 2px 4px rgba(0,0,0,0.1); flex-shrink: 0;"></div>
-        <h4 style="font-size: 1.3rem; font-weight: 800; color: var(--text-primary); margin: 0; word-break: break-all; overflow-wrap: anywhere; flex: 1;">${pill.name}</h4>
-      </div>
-      ${stockHTML ? `<div style="padding: 4px 10px; background: #FEF2F2; border-radius: 8px; border: 1px solid #FEE2E2; white-space: nowrap;">${stockHTML}</div>` : ''}
-      
-      <div style="background: var(--bg-color); border-radius: 12px; padding: 1rem; margin-top: 0.5rem; display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem; font-size: 0.85rem;">
-        <div>
-          <span style="color: var(--text-secondary); display: block; font-size: 0.7rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px;">Pauta</span>
-          <strong style="color: var(--text-primary); font-size: 1rem;">Cada ${pill.frequencyHours}h</strong>
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem;">
+          <div class="timeline-card-title" style="margin-bottom: 0;">
+            ${pill.name}
+          </div>
+          ${pillIconHTML}
         </div>
-        <div>
-          <span style="color: var(--text-secondary); display: block; font-size: 0.7rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px;">Duración</span>
-          <strong style="color: var(--text-primary); font-size: 1rem;">${durationText}</strong>
+        
+        ${stockHTML ? `<div style="margin-bottom: 1rem;">${stockHTML}</div>` : ''}
+        
+        <div class="detail-grid-container" style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; background: #f8fafc; border: 1px solid #e2e8f0; padding: 0.75rem 1rem; border-radius: 8px;">
+          <div style="display: flex; flex-direction: column; gap: 4px;">
+            <span style="font-size: 0.75rem; color: #64748b; font-weight: 700; text-transform: uppercase;">Pauta</span>
+            <strong style="color: #0f172a; font-size: 0.95rem;">Cada ${pill.frequencyHours}h</strong>
+          </div>
+          <div style="display: flex; flex-direction: column; gap: 4px;">
+            <span style="font-size: 0.75rem; color: #64748b; font-weight: 700; text-transform: uppercase;">Duración</span>
+            <strong style="color: #0f172a; font-size: 0.95rem;">${durationText}</strong>
+          </div>
         </div>
-      </div>
     `;
     medsContainer.appendChild(card);
   });
@@ -380,20 +407,18 @@ export function renderTreatmentDetail(treatmentId) {
       const borderBottom = index < timelineEvents.length - 1 ? 'border-bottom: 2px dashed #CBD5E1;' : '';
 
       row.innerHTML = `
-        <div style="display: flex; flex-direction: column; gap: 0.75rem; margin-bottom: 2rem;">
-          <div style="display: flex; align-items: center; gap: 12px; background: #F8FAFC; padding: 8px 16px; border-radius: 30px; border: 1px solid #E2E8F0; width: fit-content;">
-            <div style="width: 10px; height: 10px; border-radius: 50%; background: ${statusColor};"></div>
-            <span style="font-size: 1.4rem; font-weight: 900; color: var(--text-primary);">${formatTime(event.time)}</span>
-          </div>
-          
-          <div style="background: ${cardBg}; border: 3px solid ${borderColor}; border-radius: 20px; padding: 1.5rem; box-shadow: var(--shadow-md); min-width: 0; border-left: 8px solid ${statusColor}; margin-left: 4px;">
-            <div style="font-size: 1.4rem; font-weight: 800; color: var(--text-primary); margin-bottom: 0.75rem; word-break: break-all; overflow-wrap: anywhere; line-height: 1.2;">
-              ${event.pillName}
+        <div class="timeline-item-wrapper">
+          <div class="timeline-card" style="background: ${cardBg}; border: 3px solid ${borderColor}; border-left: 8px solid #3B82F6;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem;">
+              <div class="timeline-card-title" style="margin-bottom: 0;">
+                ${event.pillName}
+              </div>
+              <span class="timeline-time-text" style="color: #16A34A; font-size: 1.1rem;">${formatTime(event.time)}</span>
             </div>
             
-            <div style="display: flex; flex-direction: column; gap: 0.75rem; margin-top: 1rem;">
+            <div class="timeline-card-actions">
               ${event.compartment ? `
-                <div style="background: #FFFBEB; color: #92400E; padding: 8px 16px; border-radius: 12px; font-weight: 900; font-size: 1rem; border: 2px solid #F59E0B; display: flex; align-items: center; gap: 8px; width: fit-content;">
+                <div class="timeline-compartment-badge">
                   <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3">
                     <rect x="2" y="4" width="20" height="16" rx="2" ry="2"></rect>
                     <path d="M8 4v16M16 4v16M2 12h20"></path>
@@ -401,8 +426,8 @@ export function renderTreatmentDetail(treatmentId) {
                   HUECO PASTILLERO Nº${event.compartment}
                 </div>
               ` : ''}
-              <div style="font-weight: 900; font-size: 1.1rem; color: ${statusColor}; text-transform: uppercase; display: flex; align-items: center; gap: 10px;">
-                ${event.isDone ? '✅' : '⏳'} ${statusText}
+              <div class="timeline-status-text" style="color: #DC2626;">
+                ${statusText}
               </div>
             </div>
           </div>
@@ -427,31 +452,88 @@ export function renderActiveTreatments() {
     const card = document.createElement('div');
     card.className = `treatment-card ${treatment.id === currentTreatmentId ? 'active-border' : ''}`;
     
-    // Calcular tiempo de finalización más lejano entre sus pastillas
-    let maxRemaining = 0;
+    // Formatear Fecha y Hora de Inicio
+    let formattedStart = 'No definida';
+    if (treatment.startDate) {
+      let startD;
+      if (treatment.startDate.includes('T')) {
+        // Caso nuevo con hora capturada
+        startD = new Date(treatment.startDate);
+      } else {
+        // Caso antiguo: intentar extraer el timestamp de creación del ID
+        const idParts = treatment.id.split('_');
+        if (idParts.length > 1 && !isNaN(idParts[1])) {
+          startD = new Date(parseInt(idParts[1]));
+        } else {
+          startD = new Date(treatment.startDate);
+        }
+      }
+      formattedStart = startD.toLocaleString([], { dateStyle: 'short', timeStyle: 'short' });
+    }
+
+    // Calcular fin del tratamiento a partir del final de sus medicamentos
+    let maxEndDate = null;
+    let hasIndefinite = false;
+    let hasTimedPills = false;
+    
     treatmentPills.forEach(p => {
-      const rem = getDaysRemaining(p);
-      if (rem !== null && rem > maxRemaining) maxRemaining = rem;
+      if (p.endDate === null) {
+        hasIndefinite = true;
+      } else {
+        hasTimedPills = true;
+        if (maxEndDate === null || p.endDate > maxEndDate) {
+          maxEndDate = p.endDate;
+        }
+      }
     });
+
+    let formattedEnd = 'Sin medicamentos';
+    if (treatmentPills.length > 0) {
+      if (hasIndefinite) {
+        formattedEnd = 'Permanente';
+      } else if (hasTimedPills && maxEndDate !== null) {
+        const endD = new Date(maxEndDate);
+        formattedEnd = endD.toLocaleString([], { dateStyle: 'short', timeStyle: 'short' });
+      }
+    }
 
     card.innerHTML = `
       <div class="treatment-card-header">
-        <div class="treatment-card-info">
-          <h4>${treatment.pathology}</h4>
+        <div class="treatment-card-title-wrapper">
+          <span class="treatment-card-icon">📋</span>
+          <h4 class="treatment-card-title">${treatment.pathology}</h4>
+        </div>
       </div>
-    </div>
-    <div class="treatment-card-meta">
-      <span>Inicio: ${new Date(treatment.startDate).toLocaleDateString()}</span>
-      <span>${maxRemaining > 0 ? `Finaliza en aprox. ${maxRemaining} días` : 'Tratamiento indefinido'}</span>
-    </div>
-    <div class="pills-summary-list" style="display:flex; flex-direction:column; gap:8px; margin-top: 1rem;">
-      ${treatmentPills.map(p => `<span class="pill-summary-tag" style="background:#f1f5f9; padding:8px 12px; border-radius:10px; font-size:0.9rem; font-weight:700; color:var(--text-primary); border:1px solid var(--border-color); word-break:break-all; overflow-wrap:anywhere;">${p.name}</span>`).join('')}
-    </div>
-    <div style="margin-top: 1.25rem; display: flex; justify-content: space-between; align-items: center; gap: 10px;">
-      <button class="btn-add-to-treatment" style="margin-top:0; flex:1;" data-id="${treatment.id}">+ Añadir más</button>
-      <button class="btn-text btn-delete-treatment" data-id="${treatment.id}" style="color: var(--danger-color); font-size: 0.8rem; padding: 0;">Eliminar plan</button>
-    </div>
-  `;
+      
+      <div class="treatment-card-meta-list">
+        <div class="meta-item">
+          <span class="meta-label">INICIO DEL PLAN:</span>
+          <span class="meta-value">${formattedStart}</span>
+        </div>
+        <div class="meta-item">
+          <span class="meta-label">FIN ESTIMADO:</span>
+          <span class="meta-value">${formattedEnd}</span>
+        </div>
+      </div>
+
+      <div class="treatment-meds-section">
+        <div class="meds-section-title">MEDICAMENTOS EN ESTE PLAN</div>
+        <div class="treatment-summary-list">
+          ${treatmentPills.length > 0 
+            ? treatmentPills.map(p => `<span class="pill-summary-tag">${generatePillIconHTML(p.color)} <span style="margin-left:4px;">${p.name}</span></span>`).join('') 
+            : `<span class="pill-summary-empty">Ningún medicamento añadido aún</span>`}
+        </div>
+      </div>
+
+      <div class="treatment-action-row">
+        <button class="btn-add-to-treatment" data-id="${treatment.id}">
+          <span>+ Añadir medicamento</span>
+        </button>
+        <button class="btn-text btn-delete-treatment treatment-delete-btn" data-id="${treatment.id}">
+          <span>Eliminar plan</span>
+        </button>
+      </div>
+    `;
   
   // Evento para ver detalle
   card.addEventListener('click', () => {

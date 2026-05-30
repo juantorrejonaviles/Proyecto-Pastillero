@@ -68,8 +68,17 @@ const screenActiveTreatments = document.getElementById('screen-active-treatments
 const treatmentsList = document.getElementById('treatments-list');
 const treatmentsEmpty = document.getElementById('treatments-empty-state');
 
+// --- Elementos Premium / Freemium ---
+const premiumModal = document.getElementById('premium-modal');
+const btnUpgradeNow = document.getElementById('btn-upgrade-now');
+const btnPremiumClose = document.getElementById('btn-premium-close');
+const btnExportPdf = document.getElementById('btn-export-pdf');
+const inputSmsPhone = document.getElementById('sms-phone');
+const smsLockOverlay = document.getElementById('sms-lock-overlay');
+const premiumCardContainer = document.getElementById('premium-card-container');
 
-export function showModal(title, msg, isAlert = false) {
+
+export function showModal(title, msg, isAlert = false, confirmText = 'Sí, borrar') {
   return new Promise(resolve => {
     customModalTitle.innerText = title;
     customModalMsg.innerText = msg;
@@ -80,7 +89,7 @@ export function showModal(title, msg, isAlert = false) {
       btnModalOk.innerText = 'Entendido';
     } else {
       btnModalCancel.style.display = 'block';
-      btnModalOk.innerText = 'Sí, borrar';
+      btnModalOk.innerText = confirmText;
     }
 
     const onOk = () => { cleanup(); resolve(true); };
@@ -99,11 +108,73 @@ export function showModal(title, msg, isAlert = false) {
   });
 }
 
+// --- Lógica de Negocio Freemium ---
+export function isPremium() {
+  return localStorage.getItem('pastillero_is_premium') === 'true';
+}
+
+export function showPremiumPaywall() {
+  if (premiumModal) {
+    premiumModal.classList.remove('hidden');
+  }
+}
+
+export function renderPremiumUI() {
+  if (!premiumCardContainer) return;
+
+  const premium = isPremium();
+  if (premium) {
+    // Modo Premium PRO
+    premiumCardContainer.innerHTML = `
+      <div class="premium-promo-title">💎 Plan Premium PRO Activo</div>
+      <div class="premium-promo-desc">Disfrutas de tratamientos ilimitados, alertas SMS de respaldo y reportes PDF médicos activados.</div>
+      <div style="font-weight: 800; color: #1e3a8a; font-size: 0.9rem;">Suscripción Activa (2,99€/mes)</div>
+    `;
+    
+    // Desbloquear Alertas SMS
+    if (smsLockOverlay) smsLockOverlay.style.display = 'none';
+    if (inputSmsPhone) {
+      inputSmsPhone.disabled = false;
+      inputSmsPhone.value = localStorage.getItem('pastillero_sms_phone') || '';
+    }
+
+    // Desbloquear PDF Icono
+    if (btnExportPdf) {
+      const lockBadge = btnExportPdf.querySelector('.premium-lock-icon');
+      if (lockBadge) lockBadge.remove();
+    }
+  } else {
+    // Modo Gratis
+    premiumCardContainer.innerHTML = `
+      <div class="premium-promo-title">🌟 Plan Gratuito (Límite: 2 Planes)</div>
+      <div class="premium-promo-desc">Registra hasta 2 tratamientos y conecta avisos por Telegram. Pásate a Premium PRO para tratamientos ilimitados, alertas SMS de respaldo y reportes PDF médicos.</div>
+      <button type="button" id="btn-upgrade-promo" class="btn-primary" style="margin:0 auto; display:block; padding: 8px 20px;">Pasar a Premium PRO (2,99€)</button>
+    `;
+    
+    const btnPromo = document.getElementById('btn-upgrade-promo');
+    if (btnPromo) {
+      btnPromo.addEventListener('click', showPremiumPaywall);
+    }
+
+    // Bloquear Alertas SMS
+    if (smsLockOverlay) smsLockOverlay.style.display = 'flex';
+    if (inputSmsPhone) {
+      inputSmsPhone.disabled = true;
+      inputSmsPhone.value = '';
+    }
+  }
+}
+
 // Cargar credenciales de Telegram si existen
 inputTgUser.value = localStorage.getItem('pastillero_tg_user') || '';
 
 // --- 4. Navegación Inferior (SPA) ---
 export function navigateTo(targetId) {
+  // Vibración háptica micro-sutil en transición de pantalla
+  if (navigator.vibrate) {
+    navigator.vibrate(15);
+  }
+
   // Asegurar que salimos de modo onboarding si navegamos
   document.body.classList.remove('onboarding-active');
 
@@ -158,15 +229,27 @@ if (btnCancelOnboarding) {
   });
 }
 
+function initOnboardingDate() {
+  const startDateInput = document.getElementById('start-date');
+  if (startDateInput) {
+    const now = new Date();
+    const tzOffset = now.getTimezoneOffset() * 60000;
+    const localISOTime = (new Date(now - tzOffset)).toISOString().slice(0, 16);
+    startDateInput.value = localISOTime;
+  }
+}
+
 if (btnNewTreatmentPlan) {
   btnNewTreatmentPlan.addEventListener('click', () => {
     onboardingModal.classList.remove('hidden');
+    initOnboardingDate();
   });
 }
 
 if (btnWelcomeStart) {
   btnWelcomeStart.addEventListener('click', () => {
     onboardingModal.classList.remove('hidden');
+    initOnboardingDate();
   });
 }
 
@@ -213,6 +296,13 @@ if (onboardingForm) {
     const btnSubmit = e.submitter;
     if (btnSubmit) btnSubmit.disabled = true; // Prevenir doble clic
 
+    // Failsafe de Negocio: Límite Freemium de 2 tratamientos
+    if (treatments.length >= 2 && !isPremium()) {
+      showPremiumPaywall();
+      if (btnSubmit) btnSubmit.disabled = false;
+      return;
+    }
+
     const startDate = document.getElementById('start-date').value;
     const pathology = document.getElementById('user-pathology').value.trim();
     
@@ -256,7 +346,12 @@ if (btnSaveSettings) {
   btnSaveSettings.addEventListener('click', async () => {
     const userVal = inputTgUser.value.trim();
     localStorage.setItem('pastillero_tg_user', userVal);
-    await showModal("Configuración", "Configuración de Telegram guardada correctamente.", true);
+    
+    if (isPremium() && inputSmsPhone) {
+      localStorage.setItem('pastillero_sms_phone', inputSmsPhone.value.trim());
+    }
+
+    await showModal("Configuración", "Configuración de avisos guardada correctamente.", true);
     navigateTo('screen-today');
   });
 }
@@ -495,21 +590,47 @@ addForm.addEventListener('submit', (e) => {
   
   // Limpiar formulario y volver a pantalla Hoy
   addForm.reset();
+  const mainPillColorInput = document.getElementById('pill-color');
+  if (mainPillColorInput && typeof mainPillColorInput.syncCustomSelect === 'function') {
+    mainPillColorInput.value = 'white';
+    mainPillColorInput.syncCustomSelect();
+  }
   navItems[0].click(); // Simular volver a Hoy
 });
 
 // Marcar como tomada manualmente desde la lista
-function takePill(pillId) {
+async function takePill(pillId) {
+  const pillIndex = pills.findIndex(p => p.id === pillId);
+  if (pillIndex === -1) return;
+
+  const pill = pills[pillIndex];
+
+  // Failsafe médico: comprobar si ya se ha tomado esta misma medicina hace menos de 60 minutos
+  const threshold = 60 * 60 * 1000; // 60 minutos en ms
+  const now = Date.now();
+  const lastTaken = history.find(h => h.name === pill.name && !h.name.includes('(tratamiento finalizado)'));
+  
+  if (lastTaken) {
+    const timeDiff = now - lastTaken.takenAt;
+    if (timeDiff < threshold) {
+      const minutesAgo = Math.round(timeDiff / 60000);
+      const isConfirmed = await showModal(
+        "⚠️ Alerta de Seguridad",
+        `Registraste una toma de "${pill.name}" hace solo ${minutesAgo} minutos.\n\nRegistrar otra toma tan pronto podría causar una sobredosis accidental.\n\n¿Estás seguro de que quieres registrar esta dosis?`,
+        false,
+        "Registrar toma"
+      );
+      if (!isConfirmed) {
+        return; // Abortar registro
+      }
+    }
+  }
+
   // Vibración háptica de éxito (si está disponible)
   if (navigator.vibrate) {
     navigator.vibrate([200, 100, 200]);
   }
 
-  const pillIndex = pills.findIndex(p => p.id === pillId);
-  if (pillIndex === -1) return;
-
-  const pill = pills[pillIndex];
-  
   // Guardar en historial
   const record = {
     id: Date.now().toString(),
@@ -584,7 +705,12 @@ function openEditModal(pillId) {
   
   if (editPillIndications) editPillIndications.value = pill.indications || 'none';
   if (editPillCompartment) editPillCompartment.value = pill.compartment || '';
-  if (editPillColor) editPillColor.value = pill.color || 'white';
+  if (editPillColor) {
+    editPillColor.value = pill.color || 'white';
+    if (typeof editPillColor.syncCustomSelect === 'function') {
+      editPillColor.syncCustomSelect();
+    }
+  }
   
   editModal.classList.remove('hidden');
 }
@@ -660,6 +786,26 @@ todayList.addEventListener('click', (e) => {
 import { renderViews, getTodayPills, renderToday, renderHistory, renderTreatmentDetail, renderActiveTreatments, animateSuccess } from './src/ui.js';
 // --- 8. Motor de Alarmas Background (Interval Tracker) ---
 let activeAlarmPill = null;
+let alarmVibrationInterval = null;
+
+function startAlarmHaptics() {
+  if (!('vibrate' in navigator)) return;
+  const pattern = [500, 250, 500, 250, 1000, 500]; // 3s de vibración intermitente
+  navigator.vibrate(pattern);
+  alarmVibrationInterval = setInterval(() => {
+    navigator.vibrate(pattern);
+  }, 4000); // Repetir el patrón cada 4 segundos (3s patrón + 1s pausa)
+}
+
+function stopAlarmHaptics() {
+  if (alarmVibrationInterval) {
+    clearInterval(alarmVibrationInterval);
+    alarmVibrationInterval = null;
+  }
+  if ('vibrate' in navigator) {
+    navigator.vibrate(0); // Detener vibraciones activas
+  }
+}
 
 function checkAlarms() {
   const now = Date.now();
@@ -705,15 +851,17 @@ function triggerAlarm(pill) {
      audio.play().catch(e=>console.log("Audio play require interacción previa"));
   } catch(e) {}
   
-  if('vibrate' in navigator) navigator.vibrate([200, 100, 200, 100, 500]);
+  // Iniciar el bucle de vibración prolongado continuo
+  startAlarmHaptics();
 }
 
-btnTakePill.addEventListener('click', () => {
+btnTakePill.addEventListener('click', async () => {
   if(activeAlarmPill) {
-    takePill(activeAlarmPill.id);
+    await takePill(activeAlarmPill.id);
   }
   alarmModal.classList.add('hidden');
   activeAlarmPill = null;
+  stopAlarmHaptics();
 });
 
 btnSnoozePill.addEventListener('click', async () => {
@@ -729,6 +877,7 @@ btnSnoozePill.addEventListener('click', async () => {
   }
   alarmModal.classList.add('hidden');
   activeAlarmPill = null;
+  stopAlarmHaptics();
 });
 
 // Actualizar solo los textos de cuenta atrás (ligero, sin re-renderizar DOM)
@@ -746,40 +895,24 @@ function updateCountdowns() {
   });
 }
 
-// --- Eventos Historial ---
-document.getElementById('btn-export-history')?.addEventListener('click', () => {
-  if (history.length === 0) return showCustomModal("El historial está vacío.", true);
-  const exportTxt = "HISTORIAL MÉDICO - MI PASTILLERO\n\n" + history.map(h => `${new Date(h.takenAt).toLocaleString('es-ES')} - ${h.name}`).join('\n');
-  const blob = new Blob([exportTxt], { type: 'text/plain' });
-  const url = URL.createObjectURL(blob);
-  const a = document.createElement('a');
-  a.href = url;
-  a.download = 'Historial_Pastillero.txt';
-  a.click();
-  URL.revokeObjectURL(url);
-});
 
-document.getElementById('btn-delete-selected')?.addEventListener('click', async () => {
-  const checkboxes = document.querySelectorAll('.history-checkbox:checked');
-  if(checkboxes.length === 0) return showCustomModal("Selecciona al menos un registro para borrar.", true);
-  
-  const confirmed = await showCustomModal("¿Seguro que deseas borrar los registros seleccionados?");
-  if(!confirmed) return;
-  
-  const idsToRemove = Array.from(checkboxes).map(cb => cb.value);
-  setHistory(history.filter(h => !idsToRemove.includes((h.id || h.takenAt).toString())));
-  saveState();
-  renderViews();
-});
 
-document.getElementById('btn-delete-all')?.addEventListener('click', async () => {
-  if (history.length === 0) return showCustomModal("El historial ya está vacío.", true);
-  const confirmed = await showCustomModal("¿Estás seguro de querer BORRAR TODO el historial? Esta acción no se puede deshacer.");
-  if(!confirmed) return;
-  setHistory([]);
-  saveState();
-  renderViews();
+// AUTO-CATCH-UP AVISOS PASADOS (A petición del usuario para cerrar avisos acumulados)
+const _now = Date.now();
+let _modified = false;
+pills.forEach(pill => {
+  if (pill.nextTime <= _now) {
+    const interval = pill.frequencyHours * 60 * 60 * 1000;
+    if (interval > 0) {
+      const missed = Math.ceil((_now - pill.nextTime) / interval);
+      pill.nextTime += missed * interval;
+      _modified = true;
+    }
+  }
 });
+if (_modified) {
+  saveState();
+}
 
 // Arrancar cronómetro de comprobación cada segundo
 setInterval(() => {
@@ -787,5 +920,243 @@ setInterval(() => {
   updateCountdowns();
 }, 1000);
 
-// Inicializar Vista
+// --- 9. Selector de Color Personalizado (Pastillas y Cápsulas CSS) ---
+const colorOptions = [
+  { group: 'Pastilla redonda', value: 'white', label: 'Blanca', isCapsule: false, color: '#ffffff', bg: '#f1f5f9' },
+  { group: 'Pastilla redonda', value: 'red', label: 'Roja', isCapsule: false, color: '#ef4444', bg: '#fee2e2' },
+  { group: 'Pastilla redonda', value: 'blue', label: 'Azul', isCapsule: false, color: '#3b82f6', bg: '#eff6ff' },
+  { group: 'Pastilla redonda', value: 'yellow', label: 'Amarilla', isCapsule: false, color: '#facc15', bg: '#fef08a' },
+  { group: 'Pastilla redonda', value: 'green', label: 'Verde', isCapsule: false, color: '#22c55e', bg: '#dcfce7' },
+  { group: 'Pastilla redonda', value: 'pink', label: 'Rosa', isCapsule: false, color: '#ec4899', bg: '#fce7f3' },
+  { group: 'Cápsula bicolor', value: 'capsule-red-white', label: 'Cápsula Roja/Blanca', isCapsule: true, color: '#ef4444', bg: '#ffffff' },
+  { group: 'Cápsula bicolor', value: 'capsule-blue-white', label: 'Cápsula Azul/Blanca', isCapsule: true, color: '#3b82f6', bg: '#ffffff' },
+  { group: 'Cápsula bicolor', value: 'capsule-green-white', label: 'Cápsula Verde/Blanca', isCapsule: true, color: '#22c55e', bg: '#ffffff' },
+  { group: 'Cápsula bicolor', value: 'capsule-yellow-white', label: 'Cápsula Amarilla/Blanca', isCapsule: true, color: '#facc15', bg: '#ffffff' },
+  { group: 'Cápsula bicolor', value: 'capsule-red-yellow', label: 'Cápsula Roja/Amarilla', isCapsule: true, color: '#ef4444', bg: '#facc15' },
+  { group: 'Cápsula bicolor', value: 'capsule-blue-yellow', label: 'Cápsula Azul/Amarilla', isCapsule: true, color: '#3b82f6', bg: '#facc15' }
+];
+
+function getOptionIconHTML(option) {
+  if (option.isCapsule) {
+    return `<span class="pill-icon-capsule" style="background: linear-gradient(90deg, ${option.color} 50%, ${option.bg} 50%); border: 1.5px solid ${option.color};"></span>`;
+  } else {
+    return `<span class="pill-icon-circle" style="background: ${option.color};"></span>`;
+  }
+}
+
+function setupCustomSelect(inputId, triggerId, dropdownId) {
+  const input = document.getElementById(inputId);
+  const trigger = document.getElementById(triggerId);
+  const dropdown = document.getElementById(dropdownId);
+  
+  if (!input || !trigger || !dropdown) return;
+  
+  const container = trigger.closest('.custom-select-container');
+  if (!container) return;
+  
+  // Generar opciones en el dropdown
+  let currentGroup = '';
+  let dropdownHTML = '';
+  
+  colorOptions.forEach(opt => {
+    if (opt.group !== currentGroup) {
+      currentGroup = opt.group;
+      dropdownHTML += `<div class="custom-select-group-label">${currentGroup}</div>`;
+    }
+    
+    dropdownHTML += `
+      <div class="custom-select-option" data-value="${opt.value}">
+        ${getOptionIconHTML(opt)}
+        <span>${opt.label}</span>
+      </div>
+    `;
+  });
+  
+  dropdown.innerHTML = dropdownHTML;
+  
+  // Función para actualizar la opción seleccionada visualmente
+  function updateSelection(val) {
+    input.value = val;
+    const selectedOpt = colorOptions.find(o => o.value === val) || colorOptions[0];
+    
+    // Actualizar contenido del trigger
+    trigger.querySelector('.custom-select-trigger-text').innerHTML = `
+      ${getOptionIconHTML(selectedOpt)}
+      <span>${selectedOpt.label}</span>
+    `;
+    
+    // Marcar como seleccionado en la lista
+    dropdown.querySelectorAll('.custom-select-option').forEach(el => {
+      if (el.dataset.value === val) {
+        el.classList.add('selected');
+      } else {
+        el.classList.remove('selected');
+      }
+    });
+  }
+  
+  // Valor inicial
+  updateSelection(input.value || 'white');
+  
+  // Abrir / Cerrar dropdown
+  trigger.addEventListener('click', (e) => {
+    e.stopPropagation();
+    
+    // Cerrar otros dropdowns abiertos
+    document.querySelectorAll('.custom-select-container').forEach(c => {
+      if (c !== container) c.classList.remove('active');
+    });
+    
+    container.classList.toggle('active');
+  });
+  
+  // Click en una opción
+  dropdown.addEventListener('click', (e) => {
+    const optionEl = e.target.closest('.custom-select-option');
+    if (!optionEl) return;
+    
+    const val = optionEl.dataset.value;
+    updateSelection(val);
+    container.classList.remove('active');
+    
+    // Simular evento change en el input oculto
+    input.dispatchEvent(new Event('change'));
+  });
+  
+  // Escuchar cambios de valor en el hidden input (por ejemplo, al abrir el modal de edición)
+  input.syncCustomSelect = function() {
+    updateSelection(input.value);
+  };
+}
+
+// Inicializar selectores personalizados
+setupCustomSelect('pill-color', 'pill-color-trigger', 'pill-color-dropdown');
+setupCustomSelect('edit-pill-color', 'edit-pill-color-trigger', 'edit-pill-color-dropdown');
+
+// Cerrar dropdowns al pulsar fuera
+document.addEventListener('click', () => {
+  document.querySelectorAll('.custom-select-container').forEach(c => {
+    c.classList.remove('active');
+  });
+});
+
+// --- Eventos del Modelo de Negocio Premium ---
+
+// Cerrar Paywall
+if (btnPremiumClose) {
+  btnPremiumClose.addEventListener('click', () => {
+    premiumModal.classList.add('hidden');
+  });
+}
+
+// Abrir Paywall al pulsar en el overlay de SMS
+if (smsLockOverlay) {
+  smsLockOverlay.addEventListener('click', () => {
+    showPremiumPaywall();
+  });
+}
+
+// Abrir Paywall al pulsar en el botón PDF (o generar reporte si es Premium)
+if (btnExportPdf) {
+  btnExportPdf.addEventListener('click', async () => {
+    if (!isPremium()) {
+      showPremiumPaywall();
+    } else {
+      // Generar Reporte de Adherencia Premium
+      if (history.length === 0) {
+        await showModal("Historial Vacío", "No hay datos en el historial para generar un reporte PDF.", true);
+        return;
+      }
+      
+      let reportHtml = `
+        <div style="font-family: Arial, sans-serif; padding: 2rem; color: #333; max-width: 800px; margin: 0 auto; border: 1px solid #ddd; border-radius: 12px; box-shadow: 0 4px 10px rgba(0,0,0,0.05);">
+          <div style="display:flex; justify-content:space-between; align-items:center; border-bottom: 2px solid #3b82f6; padding-bottom: 1rem; margin-bottom: 2rem;">
+            <div>
+              <h1 style="color:#1e3a8a; margin: 0 0 4px; font-size: 1.8rem;">INFORME DE ADHERENCIA MÉDICA</h1>
+              <span style="color:#64748b; font-size:0.85rem; font-weight:bold; text-transform:uppercase;">Mi Pastillero Premium PRO</span>
+            </div>
+            <div style="text-align:right;">
+              <div style="font-size:1.5rem;">💎</div>
+              <span style="font-size: 0.8rem; color:#64748b;">Generado: ${new Date().toLocaleDateString('es-ES')}</span>
+            </div>
+          </div>
+          
+          <div style="background: #f8fafc; border-radius: 8px; padding: 1rem; margin-bottom: 2rem; border-left: 4px solid #3b82f6; font-size: 0.9rem; line-height:1.5;">
+            <strong>Estimado Doctor/a:</strong><br>
+            A continuación se detalla el registro exacto de las tomas y la adherencia del paciente asociadas a sus tratamientos activos para su revisión clínica.
+          </div>
+          
+          <h3 style="color:#1e3a8a; border-bottom: 1px solid #e2e8f0; padding-bottom: 6px;">Resumen de Tratamientos Activos</h3>
+          <ul style="padding-left:1.5rem; line-height:1.6; font-size: 0.95rem;">
+            ${treatments.map(t => {
+              const pillsList = pills.filter(p => p.treatmentId === t.id).map(p => p.name).join(', ') || 'Sin medicación añadida';
+              return `<li><strong>${t.pathology.toUpperCase()}</strong> (Inicio: ${new Date(t.startDate).toLocaleDateString()}): ${pillsList}</li>`;
+            }).join('')}
+          </ul>
+          
+          <h3 style="color:#1e3a8a; border-bottom: 1px solid #e2e8f0; padding-bottom: 6px; margin-top:2rem;">Registro Cronológico del Historial</h3>
+          <table style="width:100%; border-collapse: collapse; font-size:0.85rem; text-align:left; margin-top: 1rem;">
+            <thead>
+              <tr style="background:#f1f5f9; border-bottom:2px solid #cbd5e1;">
+                <th style="padding:10px;">Fecha y Hora</th>
+                <th style="padding:10px;">Medicamento</th>
+                <th style="padding:10px;">Programado para</th>
+                <th style="padding:10px;">Estado</th>
+              </tr>
+            </thead>
+            <tbody>
+              ${history.map(h => {
+                const status = h.name.includes('(tratamiento finalizado)') ? 'Finalizado' : 'Tomada a tiempo ✅';
+                return `
+                  <tr style="border-bottom: 1px solid #e2e8f0;">
+                    <td style="padding:8px 10px;">${new Date(h.takenAt).toLocaleString()}</td>
+                    <td style="padding:8px 10px; font-weight:bold;">${h.name}</td>
+                    <td style="padding:8px 10px;">${h.scheduledFor ? new Date(h.scheduledFor).toLocaleTimeString() : 'N/A'}</td>
+                    <td style="padding:8px 10px; color:#16a34a; font-weight:bold;">${status}</td>
+                  </tr>
+                `;
+              }).join('')}
+            </tbody>
+          </table>
+          
+          <div style="text-align:center; margin-top: 3rem; border-top: 1px solid #e2e8f0; padding-top: 1.5rem; font-size: 0.8rem; color:#94a3b8;">
+            Informe de adherencia generado por Mi Pastillero Premium PRO. Los datos presentados están seguros y encriptados localmente.
+          </div>
+        </div>
+      `;
+      
+      // Abrir una ventana limpia y llamar al cuadro de impresión
+      const printWindow = window.open('', '_blank');
+      printWindow.document.write(`<html><head><title>Informe de Adherencia</title></head><body onload="window.print();window.close();">${reportHtml}</body></html>`);
+      printWindow.document.close();
+    }
+  });
+}
+
+// Simulación de Compra de Suscripción PRO
+if (btnUpgradeNow) {
+  btnUpgradeNow.addEventListener('click', async () => {
+    btnUpgradeNow.disabled = true;
+    btnUpgradeNow.innerHTML = `<span class="premium-spinner"></span>Procesando pago seguro...`;
+    
+    // Simular retraso de pasarela bancaria segura de 3 segundos
+    setTimeout(async () => {
+      localStorage.setItem('pastillero_is_premium', 'true');
+      btnUpgradeNow.disabled = false;
+      btnUpgradeNow.innerText = "Activar Suscripción PRO";
+      premiumModal.classList.add('hidden');
+      
+      // Renderizar UI Premium
+      renderPremiumUI();
+      renderViews();
+      
+      if('vibrate' in navigator) navigator.vibrate([100, 50, 100, 50, 300]);
+      
+      await showModal("💎 ¡Bienvenido a Premium PRO!", "Tu suscripción ha sido activada con éxito. Ya puedes registrar tratamientos ilimitados, usar alertas SMS y exportar informes médicos en PDF.", true);
+    }, 3000);
+  });
+}
+
+// Inicializar Vista y Premium
+renderPremiumUI();
 renderViews();

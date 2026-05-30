@@ -61,8 +61,10 @@ body {
 
 /* Header */
 .app-header {
-  padding: 1.5rem 1.5rem 0.5rem;
-  background-color: transparent;
+  height: 80px;
+  padding: 0 1.5rem;
+  background-color: #ffffff;
+  border-bottom: 1px solid var(--border-color);
   z-index: 10;
 }
 
@@ -1349,65 +1351,190 @@ body.onboarding-active .app-content {
   box-shadow: 0 2px 8px rgba(79, 70, 229, 0.2);
 }
 
-/* Tarjetas de Tratamiento Activo */
+/* Tarjetas de Tratamiento Activo - Rediseño Premium */
 .treatment-card {
   background: var(--bg-card);
-  border-radius: 16px;
-  padding: 1.25rem;
-  box-shadow: var(--shadow-sm);
-  margin-bottom: 1rem;
-  border: 1px solid var(--border-color);
-  transition: transform 0.2s;
+  border-radius: 24px;
+  padding: 1.5rem;
+  box-shadow: var(--shadow-md);
+  margin-bottom: 1.25rem;
+  border: 2px solid var(--border-color);
+  transition: transform 0.2s, box-shadow 0.2s;
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+  cursor: pointer;
+}
+
+.treatment-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 12px 20px -3px rgba(0, 71, 128, 0.12);
 }
 
 .treatment-card:active {
   transform: scale(0.98);
 }
 
-.treatment-card-header {
+.treatment-card-title-wrapper {
   display: flex;
-  justify-content: space-between;
-  align-items: flex-start;
-  margin-bottom: 0.75rem;
+  align-items: center;
+  gap: 10px;
 }
 
-.treatment-card-info h4 {
-  font-size: 1.2rem;
+.treatment-card-icon {
+  font-size: 1.4rem;
+}
+
+.treatment-card-title {
+  font-size: 1.25rem;
   font-weight: 800;
   color: var(--text-primary);
-  margin-bottom: 2px;
+  margin: 0;
+  letter-spacing: -0.5px;
 }
 
-.treatment-card-pathology {
-  font-size: 0.9rem;
-  color: var(--primary-color);
-  font-weight: 600;
-}
-
-.treatment-card-meta {
-  font-size: 0.85rem;
-  color: var(--text-secondary);
+/* Lista de metadatos */
+.treatment-card-meta-list {
   display: flex;
   flex-direction: column;
   gap: 4px;
+  margin-top: 2px;
 }
 
-.pills-summary-list {
+.meta-item {
+  font-size: 0.68rem; /* Fuente más pequeña y limpia */
+  color: var(--text-secondary);
+  line-height: 1.35;
+}
+
+.meta-label {
+  font-weight: 800;
+  color: #64748b; /* Gris suave profesional */
+  margin-right: 4px;
+  letter-spacing: 0.2px;
+}
+
+.meta-value {
+  font-weight: 600;
+  color: var(--text-secondary);
+}
+
+/* Sección de Medicamentos */
+.treatment-meds-section {
+  display: flex;
+  flex-direction: column;
+  gap: 10px !important;
+  border-top: 1px dashed var(--border-color);
+  padding-top: 1.25rem !important; /* Separación holgada */
+}
+
+.meds-section-title {
+  font-size: 0.65rem !important; /* Fuente muy compacta */
+  font-weight: 800;
+  color: #64748b;
+  letter-spacing: 0.8px;
+  margin-bottom: 6px !important;
+  display: block !important;
+}
+
+/* Chips de medicamentos */
+.treatment-summary-list {
   display: flex;
   flex-wrap: wrap;
-  gap: 6px;
-  margin-top: 1rem;
-  padding-top: 1rem;
-  border-top: 1px dashed var(--border-color);
+  gap: 8px;
+  margin-top: 6px !important; /* Separación absoluta */
 }
 
-.pill-summary-tag {
-  font-size: 0.75rem;
-  background: #f3f4f6;
-  color: #374151;
-  padding: 3px 10px;
-  border-radius: 6px;
-  border: 1px solid #e5e7eb;
+.treatment-summary-list .pill-summary-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: rgba(106, 170, 228, 0.08);
+  color: var(--text-primary);
+  padding: 5px 12px !important; /* Chip más compacto */
+  border-radius: 20px !important;
+  font-size: 0.8rem !important; /* Fuente de chip adaptada */
+  font-weight: 700 !important;
+  border: 1px solid rgba(106, 170, 228, 0.2) !important;
+  box-shadow: 0 2px 4px rgba(0, 71, 128, 0.02) !important;
+  transition: all 0.2s !important;
+  word-break: normal !important;
+  overflow-wrap: normal !important;
+  white-space: nowrap !important;
+}
+
+.treatment-summary-list .pill-summary-tag:hover {
+  background: rgba(106, 170, 228, 0.15) !important;
+  border-color: rgba(106, 170, 228, 0.3) !important;
+}
+
+.pill-summary-empty {
+  font-size: 0.85rem;
+  color: #94a3b8;
+  font-style: italic;
+}
+
+/* Acciones */
+.treatment-action-row {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  margin-top: 4px;
+}
+
+.treatment-card .btn-add-to-treatment {
+  flex: 2;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 10px 16px;
+  background: rgba(79, 70, 229, 0.08);
+  border: 1.5px dashed var(--primary-color);
+  border-radius: 14px;
+  color: var(--primary-color);
+  font-size: 0.9rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.2s;
+  min-height: 48px;
+  margin: 0 !important;
+}
+
+.treatment-card .btn-add-to-treatment:hover {
+  background: rgba(79, 70, 229, 0.12);
+  border-color: var(--primary-hover);
+  color: var(--primary-hover);
+}
+
+.treatment-card .btn-add-to-treatment:active {
+  transform: scale(0.97);
+}
+
+.treatment-card .btn-delete-treatment {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 10px 16px;
+  background: transparent;
+  border: 1.5px solid transparent;
+  border-radius: 14px;
+  color: var(--danger-color);
+  font-size: 0.85rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.2s;
+  min-height: 48px;
+  text-align: center;
+}
+
+.treatment-card .btn-delete-treatment:hover {
+  background: rgba(227, 6, 19, 0.08);
+}
+
+.treatment-card .btn-delete-treatment:active {
+  transform: scale(0.97);
 }
 
 /* Secciones de Tratamiento en Pantalla Hoy */
@@ -1640,47 +1767,220 @@ body.onboarding-active .app-content {
   border: 1px solid var(--border-color);
   border-radius: 12px;
 }
+
 .modal-text-center {
   text-align: center;
   width: 90%;
   max-width: 330px;
   padding: 2rem 1.5rem;
 }
+
 .modal-msg-text {
   margin-bottom: 1.5rem;
   color: var(--text-secondary);
   line-height: 1.4;
 }
+
 .modal-actions {
   display: flex;
   gap: 10px;
   justify-content: center;
 }
+
 .modal-cancel-text {
   flex: 1;
   padding: 10px;
   color: var(--text-secondary);
 }
+
 .modal-title {
   margin-bottom: 1.25rem;
   color: var(--text-primary);
 }
 
-.pills-summary-list {
+/* --- Timeline (Cronograma de Hoy) --- */
+#today-timeline, .timeline-container, #detail-timeline-list {
   display: flex;
-  flex-direction: column; 
-  gap: 10px;
-  margin-top: 1.5rem;
+  flex-direction: column;
+  gap: 1.5rem;
+  padding: 1rem 0;
 }
 
-.pill-summary-tag {
-  background: #f1f5f9;
-  padding: 10px 15px;
-  border-radius: 12px;
-  font-size: 1rem;
+.timeline-item-wrapper {
+  display: flex;
+  gap: 1rem;
+  position: relative;
+  align-items: stretch;
+}
+
+.timeline-time-badge {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  min-width: 65px;
+  position: relative;
+}
+
+/* Vertical line connecting the timeline dots */
+.timeline-item-wrapper:not(:last-child) .timeline-time-badge::after {
+  content: '';
+  position: absolute;
+  top: 24px;
+  bottom: -24px;
+  width: 2px;
+  background-color: #e2e8f0;
+  z-index: 0;
+}
+
+.timeline-time-dot {
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  border: 4px solid #ffffff;
+  box-shadow: 0 0 0 2px #cbd5e1;
+  z-index: 1;
+  margin-bottom: 6px;
+}
+
+.timeline-time-text {
+  font-weight: 800;
+  color: #334155;
+  font-size: 0.95rem;
+}
+
+.timeline-card {
+  flex: 1;
+  border-radius: 16px;
+  padding: 1rem 1.25rem;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
+  transition: all 0.2s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+.timeline-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+}
+
+.timeline-card-title {
+  font-size: 1.15rem;
+  font-weight: 800;
+  color: #0f172a;
+  margin: 0 0 0.75rem 0;
+}
+
+.timeline-card-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  align-items: center;
+}
+
+.timeline-compartment-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 10px;
+  background-color: #f1f5f9;
+  color: #475569;
+  border-radius: 8px;
+  font-size: 0.85rem;
   font-weight: 700;
-  color: var(--text-primary);
-  border: 1.5px solid var(--border-color);
-  word-break: break-all;
-  overflow-wrap: anywhere;
+  border: 1px solid #e2e8f0;
+}
+
+.timeline-status-text {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.85rem;
+  font-weight: 800;
+  padding: 4px 10px;
+  border-radius: 8px;
+  background-color: rgba(255, 255, 255, 0.5);
+}
+\n
+/* --- Tarjetas de Medicación en Detalle --- */
+.detail-med-card {
+  background: #ffffff;
+  border-radius: 12px;
+  padding: 1.25rem;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
+  border: 1px solid #e2e8f0;
+  margin-bottom: 1rem;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.detail-med-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+}
+
+.detail-card-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 0.75rem;
+  padding-bottom: 0.75rem;
+  border-bottom: 1px solid #f1f5f9;
+}
+
+.detail-card-title {
+  font-size: 1.15rem;
+  font-weight: 800;
+  color: #0f172a;
+  margin: 0;
+}
+
+.detail-stock-badge-container {
+  display: inline-flex;
+  align-items: center;
+  margin-bottom: 1rem;
+  padding: 4px 10px;
+  background-color: #f8fafc;
+  border-radius: 8px;
+  border: 1px solid #e2e8f0;
+}
+
+.detail-stock-text {
+  font-size: 0.85rem;
+  font-weight: 700;
+}
+
+.detail-grid-container {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+  background: #f8fafc;
+  padding: 0.75rem 1rem;
+  border-radius: 8px;
+}
+
+.detail-grid-container > div {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.detail-grid-label {
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  font-weight: 700;
+  color: #64748b;
+}
+
+.detail-grid-value {
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: #1e293b;
+}
+
+/* Make sure the vertical list has a nice gap */
+.detail-meds-vertical-list {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  padding: 0.5rem 0;
 }

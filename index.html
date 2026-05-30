@@ -10,7 +10,7 @@
   <link rel="apple-touch-icon" href="./icon-512.png">
   <link rel="manifest" href="./manifest.json">
   <link rel="icon" type="image/png" href="./icon-512.png">
-  <link rel="stylesheet" href="./style.css?v=11">
+  <link rel="stylesheet" href="./style.css?v=20">
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet">
 </head>
 <body>
@@ -166,24 +166,19 @@
               <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" class="icon-middle-mr-4"><path d="M12 3c-4.97 0-9 4.03-9 9s4.03 9 9 9c.83 0 1.5-.67 1.5-1.5 0-.39-.15-.74-.39-1-.23-.27-.38-.62-.38-.98 0-.83.67-1.5 1.5-1.5H16c2.76 0 5-2.24 5-5 0-4.42-4.03-8-9-8zm-5.5 9c-.83 0-1.5-.67-1.5-1.5S5.67 9 6.5 9 8 9.67 8 10.5 7.33 12 6.5 12zm3-4C8.67 8 8 7.33 8 6.5S8.67 5 9.5 5s1.5.67 1.5 1.5S10.33 8 9.5 8zm5 0c-.83 0-1.5-.67-1.5-1.5S13.67 5 14.5 5s1.5.67 1.5 1.5S15.33 8 14.5 8zm3 4c-.83 0-1.5-.67-1.5-1.5S16.67 9 17.5 9s1.5.67 1.5 1.5-.67 1.5-1.5 1.5z"></path></svg>
               Color de la pastilla
             </label>
-            <select id="pill-color" class="select-styled">
-              <optgroup label="Pastilla redonda">
-                <option value="white">⚪ Blanca</option>
-                <option value="red">🔴 Roja</option>
-                <option value="blue">🔵 Azul</option>
-                <option value="yellow">🟡 Amarilla</option>
-                <option value="green">🟢 Verde</option>
-                <option value="pink">🌸 Rosa</option>
-              </optgroup>
-              <optgroup label="Cápsula bicolor">
-                <option value="capsule-red-white">💊 Cápsula Roja/Blanca</option>
-                <option value="capsule-blue-white">💊 Cápsula Azul/Blanca</option>
-                <option value="capsule-green-white">💊 Cápsula Verde/Blanca</option>
-                <option value="capsule-yellow-white">💊 Cápsula Amarilla/Blanca</option>
-                <option value="capsule-red-yellow">💊 Cápsula Roja/Amarilla</option>
-                <option value="capsule-blue-yellow">💊 Cápsula Azul/Amarilla</option>
-              </optgroup>
-            </select>
+            <div class="custom-select-container">
+              <div class="custom-select-trigger" id="pill-color-trigger" tabindex="0">
+                <div class="custom-select-trigger-text">
+                  <span class="pill-icon-circle" style="background: #ffffff;"></span>
+                  <span>Blanca</span>
+                </div>
+                <span class="custom-select-arrow">
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M7 10l5 5 5-5z"></path></svg>
+                </span>
+              </div>
+              <div class="custom-select-dropdown" id="pill-color-dropdown"></div>
+              <input type="hidden" id="pill-color" value="white">
+            </div>
           </div>
 
           <div class="input-group">
@@ -243,6 +238,12 @@
           </svg>
           Guardar
         </button>
+        <button id="btn-export-pdf" class="btn-history-tool">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor" class="icon-mr-3">
+            <path d="M20 2H8c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm-8.5 7.5c0 .83-.67 1.5-1.5 1.5H9v2H7.5V8H10c.83 0 1.5.67 1.5 1.5zm5 2c0 .83-.67 1.5-1.5 1.5h-2.5V8h2.5c.83 0 1.5.67 1.5 1.5v2zm4-2.5H19v1h1.5V11H19v2h-1.5V8h3v1.5z"></path>
+          </svg>
+          PDF <span class="premium-lock-icon">🔒</span>
+        </button>
         <button id="btn-delete-selected" class="btn-history-tool">
           <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor" class="icon-mr-3">
             <path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z"></path>
@@ -267,7 +268,8 @@
 
     <!-- Pantalla: Ajustes (Oculta por defecto de navegación principal) -->
     <section id="screen-settings" class="screen">
-      <div class="card">
+      <div id="premium-card-container" class="premium-promo-card mb-4"></div>
+      <div class="card form-container">
         <h3>
           <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor" class="icon-middle-mr-6"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z"></path></svg>
           Avisos al Móvil (Familiar/Cuidador)
@@ -278,6 +280,18 @@
           <div class="input-group">
             <label for="telegram-user">Código de avisos (Telegram)</label>
             <input type="text" id="telegram-user" placeholder="Ej: @tu_usuario">
+          </div>
+          <div class="input-group mt-1-5rem">
+            <label for="sms-phone">
+              Alertas SMS de Respaldo <span class="badge-premium-pro">PRO</span>
+            </label>
+            <div class="input-with-lock">
+              <input type="tel" id="sms-phone" placeholder="Ej: +34 600 000 000" disabled>
+              <div class="lock-overlay" id="sms-lock-overlay">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M18 8h-1V6c0-2.76-2.24-5-5-5S7 3.24 7 6v2H6c-1.1 0-2 .9-2 2v10c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V10c0-1.1-.9-2-2-2zm-6 9c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2zm3.1-9H8.9V6c0-1.71 1.39-3.1 3.1-3.1 1.71 0 3.1 1.39 3.1 3.1v2z"></path></svg>
+                <span>Desbloquear SMS</span>
+              </div>
+            </div>
           </div>
           <button type="button" id="btn-save-settings" class="btn-primary">Guardar Configuración</button>
         </form>
@@ -339,8 +353,8 @@
           <input type="text" id="user-pathology" required="" placeholder="Ej. Hipertensión">
         </div>
         <div class="input-group">
-          <label for="start-date">Fecha de inicio</label>
-          <input type="date" id="start-date" required="" onkeydown="return false">
+          <label for="start-date">Fecha y hora de inicio</label>
+          <input type="datetime-local" id="start-date" required="" onkeydown="return false">
         </div>
         <div class="form-actions">
           <button type="button" id="btn-cancel-onboarding" class="btn-text btn-outline-border">Cancelar</button>
@@ -426,24 +440,19 @@
             <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" class="icon-middle-mr-4"><path d="M12 3c-4.97 0-9 4.03-9 9s4.03 9 9 9c.83 0 1.5-.67 1.5-1.5 0-.39-.15-.74-.39-1-.23-.27-.38-.62-.38-.98 0-.83.67-1.5 1.5-1.5H16c2.76 0 5-2.24 5-5 0-4.42-4.03-8-9-8zm-5.5 9c-.83 0-1.5-.67-1.5-1.5S5.67 9 6.5 9 8 9.67 8 10.5 7.33 12 6.5 12zm3-4C8.67 8 8 7.33 8 6.5S8.67 5 9.5 5s1.5.67 1.5 1.5S10.33 8 9.5 8zm5 0c-.83 0-1.5-.67-1.5-1.5S13.67 5 14.5 5s1.5.67 1.5 1.5S15.33 8 14.5 8zm3 4c-.83 0-1.5-.67-1.5-1.5S16.67 9 17.5 9s1.5.67 1.5 1.5-.67 1.5-1.5 1.5z"></path></svg>
             Color de la pastilla
           </label>
-          <select id="edit-pill-color" class="select-styled">
-            <optgroup label="Pastilla redonda">
-              <option value="white">⚪ Blanca</option>
-              <option value="red">🔴 Roja</option>
-              <option value="blue">🔵 Azul</option>
-              <option value="yellow">🟡 Amarilla</option>
-              <option value="green">🟢 Verde</option>
-              <option value="pink">🌸 Rosa</option>
-            </optgroup>
-            <optgroup label="Cápsula bicolor">
-              <option value="capsule-red-white">💊 Cápsula Roja/Blanca</option>
-              <option value="capsule-blue-white">💊 Cápsula Azul/Blanca</option>
-              <option value="capsule-green-white">💊 Cápsula Verde/Blanca</option>
-              <option value="capsule-yellow-white">💊 Cápsula Amarilla/Blanca</option>
-              <option value="capsule-red-yellow">💊 Cápsula Roja/Amarilla</option>
-              <option value="capsule-blue-yellow">💊 Cápsula Azul/Amarilla</option>
-            </optgroup>
-          </select>
+          <div class="custom-select-container">
+            <div class="custom-select-trigger" id="edit-pill-color-trigger" tabindex="0">
+              <div class="custom-select-trigger-text">
+                <span class="pill-icon-circle" style="background: #ffffff;"></span>
+                <span>Blanca</span>
+              </div>
+              <span class="custom-select-arrow">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M7 10l5 5 5-5z"></path></svg>
+              </span>
+            </div>
+            <div class="custom-select-dropdown" id="edit-pill-color-dropdown"></div>
+            <input type="hidden" id="edit-pill-color" value="white">
+          </div>
         </div>
         <div class="input-group">
           <label for="edit-pill-duration">
@@ -472,6 +481,50 @@
           <button type="submit" class="btn-primary btn-fill">Guardar</button>
         </div>
       </form>
+    </div>
+  </div>
+
+  <!-- Modal de Pago / Suscripción Premium -->
+  <div id="premium-modal" class="modal hidden">
+    <div class="modal-content card premium-paywall-box">
+      <div class="premium-crown-badge">💎</div>
+      <h2 class="premium-title">Pastillero Premium PRO</h2>
+      <p class="premium-tagline">El cuidado más completo para ti y tu familia</p>
+      
+      <div class="premium-features-list">
+        <div class="premium-feature-item">
+          <span class="feature-icon">♾️</span>
+          <div>
+            <strong>Tratamientos Ilimitados</strong>
+            <p>Registra todos los planes y medicamentos que necesites sin restricciones de cantidad.</p>
+          </div>
+        </div>
+        <div class="premium-feature-item">
+          <span class="feature-icon">💬</span>
+          <div>
+            <strong>Alertas SMS de Respaldo</strong>
+            <p>Avisamos a tu cuidador por SMS si te retrasas, incluso si el móvil no tiene internet.</p>
+          </div>
+        </div>
+        <div class="premium-feature-item">
+          <span class="feature-icon">📄</span>
+          <div>
+            <strong>Reportes PDF Médicos</strong>
+            <p>Genera un informe mensual de adherencia limpio y profesional listo para entregar a tu médico.</p>
+          </div>
+        </div>
+      </div>
+      
+      <div class="premium-price-box">
+        <span class="old-price">4,99€</span>
+        <span class="current-price">2,99€<small>/mes</small></span>
+        <span class="discount-badge">¡Ahorra 40%!</span>
+      </div>
+      
+      <div class="premium-actions">
+        <button id="btn-upgrade-now" class="btn-premium-upgrade">Activar Suscripción PRO</button>
+        <button id="btn-premium-close" class="btn-text mt-2">Tal vez más tarde</button>
+      </div>
     </div>
   </div>
 
